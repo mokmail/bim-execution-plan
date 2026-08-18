@@ -143,7 +143,16 @@ h4 { font-size: 0.9rem; color: var(--accent); margin-top: 1.2em; }
   border-radius: 0; border: none;
 }
 .wizard-full .wizard-head { padding: 14px 22px; }
-.wizard-title { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; }
+.wizard-title { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; flex-wrap: wrap; }
+.wizard-name-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; white-space: nowrap; }
+.wizard-name-input {
+  flex: 1; min-width: 220px; max-width: 420px;
+  font-size: 1.15rem; font-weight: 600; padding: 8px 14px;
+  border: 2px solid var(--border-2); border-radius: 8px;
+  background: var(--bg); color: var(--text);
+}
+.wizard-name-input:focus { border-color: var(--accent); outline: none; }
+.wizard-name-input::placeholder { font-weight: 400; color: var(--muted); }
 .wizard-body-full {
   flex: 1; display: flex; overflow: hidden; min-height: 0;
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { BepDocument } from "../types/bep";
 import { sections, sectionForField } from "./sections";
 import { validateBep, complianceStatus } from "../lib/bep";
@@ -19,6 +19,12 @@ interface Props {
 export function ProjectWizard({ doc, isNew, authorName, onAuthorChange, onDocChange, onSubmit, onCancel }: Props) {
   const [stepIdx, setStepIdx] = useState(0);
   const [commitOnSave, setCommitOnSave] = useState(!isNew);
+  const nameInput = useRef<HTMLInputElement>(null);
+
+  // Auto-focus the project name when creating a new plan.
+  useEffect(() => {
+    if (isNew) nameInput.current?.focus();
+  }, [isNew]);
 
   const active = sections[stepIdx];
   const Editor = active.Component;
@@ -36,7 +42,17 @@ export function ProjectWizard({ doc, isNew, authorName, onAuthorChange, onDocCha
     <div className="wizard wizard-full">
       <div className="wizard-head">
         <div className="wizard-title">
-          <strong>{isNew ? "New BIM Execution Plan" : doc.projectName}</strong>
+          <span className="wizard-name-label">{isNew ? "New BIM Execution Plan" : "Project"}</span>
+          <input
+            ref={nameInput}
+            className="input wizard-name-input"
+            placeholder="Project name — e.g. North Campus Extension"
+            value={doc.projectName}
+            onChange={(e) => {
+              const v = e.target.value;
+              onDocChange({ ...doc, projectName: v, projectInformation: { ...doc.projectInformation, projectName: v } });
+            }}
+          />
           <span className="pill pill-mode">{doc.mode}</span>
           <span className="pill">{complianceCount}/{compliance.length} compliance</span>
         </div>
