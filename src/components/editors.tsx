@@ -1,6 +1,6 @@
 import { PENN_STATE_BIM_USES } from "../lib/options";
 import type { BepDocument, SoftwareItem } from "../types/bep";
-import { Field, TextField, TextArea, Select, Checkbox, Combobox, AddButton, RemoveButton } from "./ui";
+import { Field, TextField, TextArea, Select, Checkbox, Combobox, AddButton, RemoveButton, DateField, TagInput, MultiSelect, PriorityField, SearchableSelect } from "./ui";
 import {
   DELIVERY_METHODS,
   PROJECT_SECTORS,
@@ -142,8 +142,8 @@ export function ProjectInformationEditor({ doc, setDoc }: { doc: BepDocument; se
       <Field label="Contract route">
         <Combobox value={p.contractRoute} onChange={(v) => up({ contractRoute: v })} options={CONTRACT_ROUTES} />
       </Field>
-      <Field label="Start date"><TextField value={p.startDate} onChange={(v) => up({ startDate: v })} /></Field>
-      <Field label="End date"><TextField value={p.endDate} onChange={(v) => up({ endDate: v })} /></Field>
+      <Field label="Start date"><DateField value={p.startDate} onChange={(v) => up({ startDate: v })} /></Field>
+      <Field label="End date"><DateField value={p.endDate} onChange={(v) => up({ endDate: v })} /></Field>
       <Field label="Duration / key dates"><TextField value={p.duration} onChange={(v) => up({ duration: v })} /></Field>
       <div className="full">
         <Field label="Project description"><TextArea value={p.description} onChange={(v) => up({ description: v })} /></Field>
@@ -160,13 +160,12 @@ export function BimGoalsEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetD
   return (
     <div>
       <h4>Project BIM goals</h4>
-      {g.goals.map((goal, i) => (
-        <div key={i} className="row">
-          <TextField value={goal} onChange={(v) => setGoals(g.goals.map((x, j) => (j === i ? v : x)))} />
-          <RemoveButton onClick={() => setGoals(g.goals.filter((_, j) => j !== i))} />
-        </div>
-      ))}
-      <AddButton label="Add goal" onClick={() => setGoals([...g.goals, ""])} />
+      <TagInput
+        tags={g.goals}
+        onChange={setGoals}
+        placeholder="type a goal + Enter"
+        suggestions={["Reduce construction conflicts through 3D coordination", "Improve cost certainty via early quantity takeoffs", "Streamline operations and maintenance handover", "Meet appointing party information requirements"]}
+      />
       <h4>BIM Uses</h4>
       {g.uses.length === 0 && <p className="muted">No BIM uses yet.</p>}
       {g.uses.map((u) => (
@@ -184,12 +183,7 @@ export function BimGoalsEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetD
                 ]} />
             </Field>
             <Field label="Priority">
-              <Select value={u.priority} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, priority: v } : x))}
-                options={[
-                  { value: "high", label: "High" },
-                  { value: "medium", label: "Medium" },
-                  { value: "low", label: "Low" },
-                ]} />
+              <PriorityField value={u.priority} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, priority: v } : x))} />
             </Field>
             <RemoveButton onClick={() => setUses(g.uses.filter((x) => x.id !== u.id))} />
           </div>
@@ -235,7 +229,12 @@ export function RolesEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc 
         <>
           <h4>RACI matrix</h4>
           <Field label="Activities (one per line)">
-            <TextArea value={r.raciActivities.join("\n")} rows={4} onChange={(v) => setActivities(v.split("\n").map((s) => s.trim()).filter(Boolean))} />
+            <TagInput
+              tags={r.raciActivities}
+              onChange={setActivities}
+              placeholder="type an activity + Enter"
+              suggestions={["3D Coordination", "Design Authoring", "Clash Detection", "Model Quality Check", "Information Handover"]}
+            />
           </Field>
           {r.raciActivities.length > 0 && (
             <table className="table">
@@ -354,8 +353,8 @@ function SoftwareList({
       <h4>{title}</h4>
       {items.map((s) => (
         <div key={s.id} className="row">
-          <Combobox value={s.discipline} placeholder="Discipline" onChange={(v) => onChange(items.map((x) => x.id === s.id ? { ...x, discipline: v } : x))} options={SOFTWARE_DISCIPLINES} />
-          <Combobox value={s.software} placeholder="Software" onChange={(v) => onChange(items.map((x) => x.id === s.id ? { ...x, software: v } : x))} options={softwareOptions} />
+          <SearchableSelect value={s.discipline} placeholder="Discipline" onChange={(v) => onChange(items.map((x) => x.id === s.id ? { ...x, discipline: v } : x))} options={SOFTWARE_DISCIPLINES} />
+          <SearchableSelect value={s.software} placeholder="Software" onChange={(v) => onChange(items.map((x) => x.id === s.id ? { ...x, software: v } : x))} options={softwareOptions} />
           <TextField value={s.version} placeholder="Version" onChange={(v) => onChange(items.map((x) => x.id === s.id ? { ...x, version: v } : x))} />
           <RemoveButton onClick={() => onChange(items.filter((x) => x.id !== s.id))} />
         </div>
@@ -385,7 +384,7 @@ export function StandardsEditor({ doc, setDoc }: { doc: BepDocument; setDoc: Set
   return (
     <div className="grid">
       <div className="full"><Field label="Applicable standards">
-        <Combobox value={st.standards} onChange={(v) => up({ standards: v })} options={STANDARDS_OPTIONS} />
+        <MultiSelect value={st.standards.split("\n").filter(Boolean)} onChange={(v) => up({ standards: v.join("\n") })} options={STANDARDS_OPTIONS} />
       </Field></div>
       <Field label="Classification system">
         <Combobox value={st.classification} onChange={(v) => up({ classification: v })} options={CLASSIFICATION_SYSTEMS} />
@@ -479,7 +478,7 @@ export function DeliveryEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetD
         <div key={m.id} className="card">
           <div className="row">
             <Field label="Milestone"><Combobox value={m.name} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, name: v } : x))} options={MILESTONE_NAMES} /></Field>
-            <Field label="Date"><TextField value={m.date} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, date: v } : x))} /></Field>
+            <Field label="Date"><DateField value={m.date} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, date: v } : x))} /></Field>
             <RemoveButton onClick={() => setMilestones(d.milestones.filter((x) => x.id !== m.id))} />
           </div>
           <div className="row">

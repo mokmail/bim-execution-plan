@@ -3,6 +3,8 @@
 A web-based tool for BIM managers and coordinators to **create, manage, and validate BIM Execution Plans (BEPs)** through an intuitive, visual workflow — built around the ISO 19650 / NBIMS-US framework.
 
 > **Note:** This project was initiated from a comprehensive research phase. See [`research/BEP-RESEARCH.md`](research/BEP-RESEARCH.md) for the full knowledge base: standards, canonical BEP structure, software-landscape analysis, and market-gap positioning.
+>
+> **📚 Exhaustive documentation:** see the [`wiki/`](wiki/README.md) — overview, standards, architecture, data model, API reference, templates, options, form components, Docker, development, and roadmap.
 
 ---
 

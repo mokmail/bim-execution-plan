@@ -89,6 +89,44 @@ h4 { font-size: 0.9rem; color: var(--accent); margin-top: 1.2em; }
 .textarea { resize: vertical; line-height: 1.5; }
 .checkbox { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; }
 
+/* ---------- Richer form components ---------- */
+.tag-input { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag-list { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; width: 100%; }
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg-3); border: 1px solid var(--border-2);
+  border-radius: 6px; padding: 3px 8px; font-size: 0.8rem;
+}
+.tag-x { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.8rem; padding: 0 2px; }
+.tag-x:hover { color: var(--err); }
+.tag-draft { flex: 1; min-width: 120px; }
+
+.multiselect { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  background: var(--bg); border: 1px solid var(--border-2); color: var(--muted);
+  border-radius: 20px; padding: 5px 12px; font-size: 0.8rem; cursor: pointer; transition: all 0.15s;
+}
+.chip:hover { border-color: var(--accent); color: var(--text); }
+.chip-on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.priority { display: inline-flex; border: 1px solid var(--border-2); border-radius: 8px; overflow: hidden; }
+.priority-btn { background: var(--bg); border: none; color: var(--muted); padding: 7px 14px; font-size: 0.8rem; cursor: pointer; transition: all 0.15s; }
+.priority-btn + .priority-btn { border-left: 1px solid var(--border-2); }
+.priority-high.active { background: var(--err); color: #fff; }
+.priority-medium.active { background: var(--warn); color: #111; }
+.priority-low.active { background: var(--ok); color: #111; }
+
+.searchable { position: relative; }
+.searchable-list {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 50;
+  background: var(--bg-3); border: 1px solid var(--border-2); border-radius: 8px;
+  margin-top: 4px; max-height: 200px; overflow-y: auto; box-shadow: var(--shadow);
+}
+.searchable-item { display: block; width: 100%; text-align: left; background: none; border: none; color: var(--text); padding: 8px 12px; font-size: 0.82rem; cursor: pointer; }
+.searchable-item:hover { background: var(--bg-2); }
+.searchable-item.selected { color: var(--accent); }
+.searchable-empty { padding: 10px 12px; color: var(--muted); font-size: 0.8rem; }
+
 /* ---------- Help icon & popup ---------- */
 .help-wrap { position: relative; display: inline-flex; margin-left: 5px; vertical-align: middle; }
 .help-icon {
