@@ -1,5 +1,26 @@
 import type { BepDocument, SoftwareItem } from "../types/bep";
-import { Field, TextField, TextArea, Select, Checkbox, AddButton, RemoveButton } from "./ui";
+import { Field, TextField, TextArea, Select, Checkbox, Combobox, AddButton, RemoveButton } from "./ui";
+import {
+  DELIVERY_METHODS,
+  PROJECT_SECTORS,
+  CONTRACT_ROUTES,
+  CLASSIFICATION_SYSTEMS,
+  LOD_SPECIFICATIONS,
+  IFC_VERSIONS,
+  MVD_OPTIONS,
+  EXCHANGE_FORMATS,
+  EXCHANGE_LOD,
+  SOFTWARE_DISCIPLINES,
+  AUTHORING_SOFTWARE,
+  COORDINATION_SOFTWARE,
+  CDE_PLATFORMS,
+  SECURITY_STANDARDS,
+  SECURITY_CLASSIFICATIONS,
+  STANDARDS_OPTIONS,
+  WORK_STAGE_REFERENCES,
+  UNITS,
+  COORDINATE_SYSTEMS,
+} from "../lib/options";
 
 // Generic helper to update a BepDocument immutably.
 type SetDoc = (updater: (d: BepDocument) => BepDocument) => void;
@@ -75,21 +96,15 @@ export function ProjectInformationEditor({ doc, setDoc }: { doc: BepDocument; se
       <Field label="Project name"><TextField value={p.projectName} onChange={(v) => { up({ projectName: v }); }} /></Field>
       <Field label="Owner / client"><TextField value={p.owner} onChange={(v) => up({ owner: v })} /></Field>
       <Field label="Location"><TextField value={p.location} onChange={(v) => up({ location: v })} /></Field>
-      <Field label="Sector"><TextField value={p.sector} onChange={(v) => up({ sector: v })} /></Field>
-      <Field label="Delivery method">
-        <Select
-          value={p.deliveryMethod || "DBB"}
-          onChange={(v) => up({ deliveryMethod: v })}
-          options={[
-            { value: "DBB", label: "Design-Bid-Build (DBB)" },
-            { value: "DB", label: "Design-Build (DB)" },
-            { value: "IPD", label: "Integrated Project Delivery (IPD)" },
-            { value: "CM", label: "Construction Manager (CM)" },
-            { value: "Other", label: "Other" },
-          ]}
-        />
+      <Field label="Sector">
+        <Combobox value={p.sector} onChange={(v) => up({ sector: v })} options={PROJECT_SECTORS} />
       </Field>
-      <Field label="Contract route"><TextField value={p.contractRoute} onChange={(v) => up({ contractRoute: v })} /></Field>
+      <Field label="Delivery method">
+        <Combobox value={p.deliveryMethod} onChange={(v) => up({ deliveryMethod: v })} options={DELIVERY_METHODS} />
+      </Field>
+      <Field label="Contract route">
+        <Combobox value={p.contractRoute} onChange={(v) => up({ contractRoute: v })} options={CONTRACT_ROUTES} />
+      </Field>
       <Field label="Start date"><TextField value={p.startDate} onChange={(v) => up({ startDate: v })} /></Field>
       <Field label="End date"><TextField value={p.endDate} onChange={(v) => up({ endDate: v })} /></Field>
       <Field label="Duration / key dates"><TextField value={p.duration} onChange={(v) => up({ duration: v })} /></Field>
@@ -227,7 +242,9 @@ export function CollaborationEditor({ doc, setDoc }: { doc: BepDocument; setDoc:
   const up = (patch: Partial<typeof c>) => setDoc((x) => ({ ...x, collaboration: { ...x.collaboration, ...patch } }));
   return (
     <div className="grid">
-      <Field label="CDE platform"><TextField value={c.cdePlatform} onChange={(v) => up({ cdePlatform: v })} /></Field>
+      <Field label="CDE platform">
+        <Combobox value={c.cdePlatform} onChange={(v) => up({ cdePlatform: v })} options={CDE_PLATFORMS} />
+      </Field>
       <Field label="Naming convention"><TextField value={c.namingConvention} onChange={(v) => up({ namingConvention: v })} /></Field>
       <div className="full">
         <Field label="Workflow states"><TextField value={c.workflowStates} onChange={(v) => up({ workflowStates: v })} /></Field>
@@ -250,14 +267,11 @@ export function DataExchangeEditor({ doc, setDoc }: { doc: BepDocument; setDoc: 
     <div>
       <div className="row">
         <Field label="IFC version">
-          <Select value={d.ifcVersion || "IFC 4"} onChange={(v) => up({ ifcVersion: v })}
-            options={[
-              { value: "IFC 2x3", label: "IFC 2x3" },
-              { value: "IFC 4", label: "IFC 4" },
-              { value: "IFC 4.3", label: "IFC 4.3" },
-            ]} />
+          <Combobox value={d.ifcVersion} onChange={(v) => up({ ifcVersion: v })} options={IFC_VERSIONS} />
         </Field>
-        <Field label="Model View Definition (MVD)"><TextField value={d.mvd} onChange={(v) => up({ mvd: v })} /></Field>
+        <Field label="Model View Definition (MVD)">
+          <Combobox value={d.mvd} onChange={(v) => up({ mvd: v })} options={MVD_OPTIONS} />
+        </Field>
       </div>
       <h4>Information exchanges</h4>
       {d.exchanges.length === 0 && <p className="muted">No exchanges defined yet.</p>}
@@ -266,22 +280,16 @@ export function DataExchangeEditor({ doc, setDoc }: { doc: BepDocument; setDoc: 
           <div className="row">
             <Field label="Name"><TextField value={e.name} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, name: v } : x))} /></Field>
             <Field label="Format">
-              <Select value={e.format || "IFC"} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, format: v } : x))}
-                options={[
-                  { value: "IFC", label: "IFC" },
-                  { value: "COBie", label: "COBie" },
-                  { value: "BCF", label: "BCF" },
-                  { value: "IDS", label: "IDS" },
-                  { value: "Native", label: "Native" },
-                  { value: "Other", label: "Other" },
-                ]} />
+              <Combobox value={e.format} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, format: v } : x))} options={EXCHANGE_FORMATS} />
             </Field>
             <Field label="Version"><TextField value={e.formatVersion} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, formatVersion: v } : x))} /></Field>
             <RemoveButton onClick={() => setExchanges(d.exchanges.filter((x) => x.id !== e.id))} />
           </div>
           <div className="row">
             <Field label="Recipient"><TextField value={e.recipient} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, recipient: v } : x))} /></Field>
-            <Field label="Level of detail"><TextField value={e.levelOfDetail} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, levelOfDetail: v } : x))} /></Field>
+            <Field label="Level of detail">
+              <Combobox value={e.levelOfDetail} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, levelOfDetail: v } : x))} options={EXCHANGE_LOD} />
+            </Field>
             <Field label="Responsible author"><TextField value={e.responsibleAuthor} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, responsibleAuthor: v } : x))} /></Field>
           </div>
         </div>
@@ -295,10 +303,12 @@ export function DataExchangeEditor({ doc, setDoc }: { doc: BepDocument; setDoc: 
 function SoftwareList({
   title,
   items,
+  softwareOptions,
   onChange,
 }: {
   title: string;
   items: SoftwareItem[];
+  softwareOptions: string[];
   onChange: (items: SoftwareItem[]) => void;
 }) {
   return (
@@ -306,8 +316,8 @@ function SoftwareList({
       <h4>{title}</h4>
       {items.map((s) => (
         <div key={s.id} className="row">
-          <TextField value={s.discipline} placeholder="Discipline" onChange={(v) => onChange(items.map((x) => x.id === s.id ? { ...x, discipline: v } : x))} />
-          <TextField value={s.software} placeholder="Software" onChange={(v) => onChange(items.map((x) => x.id === s.id ? { ...x, software: v } : x))} />
+          <Combobox value={s.discipline} placeholder="Discipline" onChange={(v) => onChange(items.map((x) => x.id === s.id ? { ...x, discipline: v } : x))} options={SOFTWARE_DISCIPLINES} />
+          <Combobox value={s.software} placeholder="Software" onChange={(v) => onChange(items.map((x) => x.id === s.id ? { ...x, software: v } : x))} options={softwareOptions} />
           <TextField value={s.version} placeholder="Version" onChange={(v) => onChange(items.map((x) => x.id === s.id ? { ...x, version: v } : x))} />
           <RemoveButton onClick={() => onChange(items.filter((x) => x.id !== s.id))} />
         </div>
@@ -322,9 +332,9 @@ export function SoftwareEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetD
   const set = (patch: Partial<typeof s>) => setDoc((x) => ({ ...x, software: { ...x.software, ...patch } }));
   return (
     <div>
-      <SoftwareList title="Authoring software" items={s.authoring} onChange={(items) => set({ authoring: items })} />
-      <SoftwareList title="Coordination / clash detection" items={s.coordination} onChange={(items) => set({ coordination: items })} />
-      <SoftwareList title="Analysis / simulation" items={s.analysis} onChange={(items) => set({ analysis: items })} />
+      <SoftwareList title="Authoring software" items={s.authoring} softwareOptions={AUTHORING_SOFTWARE} onChange={(items) => set({ authoring: items })} />
+      <SoftwareList title="Coordination / clash detection" items={s.coordination} softwareOptions={COORDINATION_SOFTWARE} onChange={(items) => set({ coordination: items })} />
+      <SoftwareList title="Analysis / simulation" items={s.analysis} softwareOptions={[...AUTHORING_SOFTWARE, ...COORDINATION_SOFTWARE]} onChange={(items) => set({ analysis: items })} />
       <div className="full"><Field label="Hardware requirements"><TextArea value={s.hardware} onChange={(v) => set({ hardware: v })} /></Field></div>
     </div>
   );
@@ -336,18 +346,18 @@ export function StandardsEditor({ doc, setDoc }: { doc: BepDocument; setDoc: Set
   const up = (patch: Partial<typeof st>) => setDoc((x) => ({ ...x, standards: { ...x.standards, ...patch } }));
   return (
     <div className="grid">
-      <div className="full"><Field label="Applicable standards"><TextArea value={st.standards} onChange={(v) => up({ standards: v })} /></Field></div>
+      <div className="full"><Field label="Applicable standards">
+        <Combobox value={st.standards} onChange={(v) => up({ standards: v })} options={STANDARDS_OPTIONS} />
+      </Field></div>
       <Field label="Classification system">
-        <Select value={st.classification || "Uniclass"} onChange={(v) => up({ classification: v })}
-          options={[
-            { value: "Uniclass", label: "Uniclass (UK)" },
-            { value: "OmniClass", label: "OmniClass (US)" },
-            { value: "Uniformat II", label: "Uniformat II" },
-            { value: "MasterFormat", label: "MasterFormat" },
-          ]} />
+        <Combobox value={st.classification} onChange={(v) => up({ classification: v })} options={CLASSIFICATION_SYSTEMS} />
       </Field>
-      <Field label="Units"><TextField value={st.units} onChange={(v) => up({ units: v })} /></Field>
-      <Field label="Coordinates / geolocation"><TextField value={st.coordinates} onChange={(v) => up({ coordinates: v })} /></Field>
+      <Field label="Units">
+        <Combobox value={st.units} onChange={(v) => up({ units: v })} options={UNITS} />
+      </Field>
+      <Field label="Coordinates / geolocation">
+        <Combobox value={st.coordinates} onChange={(v) => up({ coordinates: v })} options={COORDINATE_SYSTEMS} />
+      </Field>
       <div className="full"><Field label="Naming conventions"><TextArea value={st.namingConventions} onChange={(v) => up({ namingConventions: v })} /></Field></div>
       <div className="full"><Field label="Property sets / data templates"><TextArea value={st.propertySets} onChange={(v) => up({ propertySets: v })} /></Field></div>
     </div>
@@ -363,11 +373,7 @@ export function LodEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc })
     <div>
       <div className="row">
         <Field label="LOD specification">
-          <Select value={l.specification || "BIMForum"} onChange={(v) => up({ specification: v })}
-            options={[
-              { value: "BIMForum LOD Specification", label: "BIMForum LOD" },
-              { value: "NBS LOD", label: "NBS LOD 2-5" },
-            ]} />
+          <Combobox value={l.specification} onChange={(v) => up({ specification: v })} options={LOD_SPECIFICATIONS} />
         </Field>
         <Field label="LOIN framework"><TextField value={l.loinFramework} onChange={(v) => up({ loinFramework: v })} /></Field>
       </div>
@@ -426,7 +432,9 @@ export function DeliveryEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetD
   const setMilestones = (ms: typeof d.milestones) => setDoc((x) => ({ ...x, delivery: { ...x.delivery, milestones: ms } }));
   return (
     <div>
-      <Field label="Work stage reference (e.g. RIBA Plan of Work)"><TextField value={d.workStageReference} onChange={(v) => up({ workStageReference: v })} /></Field>
+      <Field label="Work stage reference (e.g. RIBA Plan of Work)">
+        <Combobox value={d.workStageReference} onChange={(v) => up({ workStageReference: v })} options={WORK_STAGE_REFERENCES} />
+      </Field>
       <h4>Milestones & information exchanges</h4>
       {d.milestones.length === 0 && <p className="muted">No milestones yet.</p>}
       {d.milestones.map((m) => (
@@ -456,13 +464,11 @@ export function SecurityEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetD
   return (
     <div className="grid">
       <Field label="Security standard">
-        <Select value={s.standard || "ISO 19650-5"} onChange={(v) => up({ standard: v })}
-          options={[
-            { value: "ISO 19650-5", label: "ISO 19650-5" },
-            { value: "Other", label: "Other" },
-          ]} />
+        <Combobox value={s.standard} onChange={(v) => up({ standard: v })} options={SECURITY_STANDARDS} />
       </Field>
-      <Field label="Security classification"><TextField value={s.classification} onChange={(v) => up({ classification: v })} /></Field>
+      <Field label="Security classification">
+        <Combobox value={s.classification} onChange={(v) => up({ classification: v })} options={SECURITY_CLASSIFICATIONS} />
+      </Field>
       <div className="full"><Field label="Access control & permissions"><TextArea value={s.accessControl} onChange={(v) => up({ accessControl: v })} /></Field></div>
       <div className="full"><Field label="Data protection / confidentiality"><TextArea value={s.dataProtection} onChange={(v) => up({ dataProtection: v })} /></Field></div>
       <div className="full"><Field label="Secure storage & transmission"><TextArea value={s.secureStorage} onChange={(v) => up({ secureStorage: v })} /></Field></div>

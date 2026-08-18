@@ -86,6 +86,40 @@ export function Select<T extends string>({
   );
 }
 
+// Text input that offers predefined suggestions via a datalist,
+// while still allowing free-form entry.
+let comboboxSeq = 0;
+export function Combobox({
+  value,
+  onChange,
+  options,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  placeholder?: string;
+}) {
+  const listId = `dl-${comboboxSeq++}`;
+  return (
+    <>
+      <input
+        type="text"
+        className="input"
+        list={listId}
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      <datalist id={listId}>
+        {options.map((o) => (
+          <option key={o} value={o} />
+        ))}
+      </datalist>
+    </>
+  );
+}
+
 export function Checkbox({
   checked,
   onChange,
