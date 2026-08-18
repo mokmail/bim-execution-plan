@@ -16,11 +16,14 @@ import {
   createProjectApi,
   deleteProjectApi,
   healthApi,
+  analyticsApi,
   projectIdFromName,
   type ProjectMeta,
+  type Analytics,
 } from "./lib/api";
 import { getTemplate } from "./lib/templates";
 import { ProjectWizard } from "./components/ProjectWizard";
+import { Dashboard } from "./components/Dashboard";
 
 type View = "projects" | "wizard";
 
@@ -29,8 +32,8 @@ function App() {
   const [bundle, setBundle] = useState<BepBundle | null>(null);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [isNew, setIsNew] = useState(false);
-  const [templateId, setTemplateId] = useState("penn-state");
   const [projects, setProjects] = useState<ProjectMeta[]>([]);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [serverOk, setServerOk] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
   const [authorName, setAuthorName] = useState(localStorage.getItem("bep.author") || "");
@@ -62,13 +65,22 @@ function App() {
     }
   };
 
-  // Load projects on first mount.
+  const refreshAnalytics = async () => {
+    try {
+      setAnalytics(await analyticsApi());
+    } catch (e: any) {
+      // non-fatal
+    }
+  };
+
+  // Load projects + analytics on first mount.
   useEffect(() => {
     void refreshProjects();
+    void refreshAnalytics();
   }, []);
 
   const openNewWizard = (mode: BepMode) => {
-    const template = getTemplate(templateId);
+    const template = getTemplate("penn-state");
     const doc = template ? template.build(mode, "") : emptyDocument(mode, "");
     setBundle({ current: doc, changelog: [] });
     setActiveProjectId(null);
@@ -98,6 +110,7 @@ function App() {
         const b = importBundleJson(String(reader.result));
         await createProjectApi(b);
         await refreshProjects();
+        await refreshAnalytics();
         setBundle(b);
         setActiveProjectId(projectIdFromName(b.current.projectName));
         setIsNew(false);
@@ -115,13 +128,11 @@ function App() {
     const id = activeProjectId ?? projectIdFromName(doc.projectName);
     try {
       if (isNew) {
-        // Fresh create.
         const b: BepBundle = { current: doc, changelog: [] };
         await createProjectApi(b);
         setActiveProjectId(id);
         showToast(`Project "${doc.projectName}" created`);
       } else {
-        // Save to existing project; optionally commit a versioned snapshot.
         let b: BepBundle = { ...bundle, current: doc };
         let note: string | undefined;
         if (commitOnSave) {
@@ -134,6 +145,7 @@ function App() {
         showToast(`Saved "${doc.projectName}"`);
       }
       await refreshProjects();
+      await refreshAnalytics();
       setView("projects");
     } catch (e: any) {
       showToast("Save failed: " + e.message);
@@ -145,6 +157,7 @@ function App() {
     try {
       await deleteProjectApi(id);
       await refreshProjects();
+      await refreshAnalytics();
       showToast("Project deleted");
     } catch (e: any) {
       showToast("Delete failed: " + e.message);
@@ -167,101 +180,36 @@ function App() {
   // ---------------- Render ----------------
   if (view === "projects") {
     return (
-      <div className="app projects-view">
-        <header className="topbar">
-          <h1>BIM Execution Plan Studio</h1>
-          <span className="subtitle">Author, version and validate ISO 19650-aligned BEPs</span>
-          {serverOk === false && (
-            <div className="banner-error">⚠ Backend not reachable — persistence is unavailable. Start the API (see README).</div>
-          )}
-        </header>
-
-        <div className="projects-layout">
-          <section className="panel">
-            <h2>New project</h2>
-            <div className="row gap" style={{ marginBottom: 6 }}>
-              <button className="btn btn-primary" onClick={() => openNewWizard("pre-appointment")} disabled={!serverOk}>✦ New project wizard</button>
-              <button className="btn btn-ghost" onClick={() => openNewWizard("delivery")} disabled={!serverOk}>Delivery mode</button>
-            </div>
-            <p className="muted" style={{ marginTop: 10, marginBottom: 12 }}>Template pre-fills the plan:</p>
-            <label className="field">
-              <span className="field-label">Template</span>
-              <select className="input" value={templateId} onChange={(e) => setTemplateId(e.target.value)}>
-                {(["penn-state", "natspec-iso19650", "blank"] as const).map((id) => (
-                  <option key={id} value={id}>{getTemplate(id)?.name}</option>
-                ))}
-              </select>
-            </label>
-            <p className="muted">{getTemplate(templateId)?.description}</p>
-
-            <h2>Import</h2>
-            <div className="row gap">
-              <button className="btn" onClick={() => fileInput.current?.click()} disabled={!serverOk}>Import .bep JSON</button>
-              <input
-                ref={fileInput}
-                type="file"
-                accept=".json,application/json"
-                style={{ display: "none" }}
-                onChange={(e) => e.target.files && onImportFile(e.target.files[0])}
-              />
-            </div>
-          </section>
-
-          <section className="panel">
-            <h2>Recent projects</h2>
-            {projects.length === 0 && !loading && <p className="muted">No projects yet. Create one to begin.</p>}
-            {projects.length === 0 && loading && <p className="muted">Loading projects…</p>}
-            {projects.map((p) => (
-              <div key={p.id} className="project-row">
-                <div>
-                  <strong>{p.name}</strong>
-                  <div className="project-meta">
-                    <span className="pill pill-mode">{p.mode}</span>
-                    <span className="pill">Rev {p.revision}</span>
-                    <span className="pill">{p.versionCount} {p.versionCount === 1 ? "version" : "versions"}</span>
-                  </div>
-                  <div className="muted">Updated {new Date(p.updatedAt).toLocaleString()}</div>
-                </div>
-                <div className="row gap">
-                  <button
-                    className="btn btn-ghost"
-                    title="Export markdown (convert with pandoc)"
-                    onClick={async () => {
-                      const b = await getBundleApi(p.id);
-                      exportDocumentFor(b);
-                    }}
-                  >
-                    Export
-                  </button>
-                  <button
-                    className="btn btn-ghost"
-                    title="Download .bep JSON bundle"
-                    onClick={async () => {
-                      const b = await getBundleApi(p.id);
-                      exportJsonFor(b);
-                    }}
-                  >
-                    .bep
-                  </button>
-                  <button
-                    className="btn btn-ghost"
-                    title="Delete project"
-                    onClick={() => removeProject(p.id)}
-                  >
-                    ✕
-                  </button>
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => openProject(p.id)}
-                    disabled={loading}
-                  >
-                    Edit
-                  </button>
-                </div>
-              </div>
-            ))}
-          </section>
+      <div className="app dash-app">
+        <Dashboard
+          analytics={analytics}
+          projects={projects}
+          loading={loading}
+          serverOk={serverOk}
+          onNewProject={() => openNewWizard("pre-appointment")}
+          onNewDelivery={() => openNewWizard("delivery")}
+          onOpenProject={openProject}
+          onDeleteProject={removeProject}
+          onExportMd={async (id) => {
+            const b = await getBundleApi(id);
+            exportDocumentFor(b);
+          }}
+          onExportJson={async (id) => {
+            const b = await getBundleApi(id);
+            exportJsonFor(b);
+          }}
+        />
+        <div className="dash-import">
+          <button className="btn" onClick={() => fileInput.current?.click()} disabled={!serverOk}>Import .bep JSON</button>
+          <input
+            ref={fileInput}
+            type="file"
+            accept=".json,application/json"
+            style={{ display: "none" }}
+            onChange={(e) => e.target.files && onImportFile(e.target.files[0])}
+          />
         </div>
+        {toast && <div className="toast">{toast}</div>}
       </div>
     );
   }

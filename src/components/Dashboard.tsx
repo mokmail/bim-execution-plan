@@ -1,0 +1,190 @@
+import type { Analytics } from "../lib/api";
+import type { ProjectMeta } from "../lib/api";
+
+interface Props {
+  analytics: Analytics | null;
+  projects: ProjectMeta[];
+  loading: boolean;
+  serverOk: boolean | null;
+  onNewProject: () => void;
+  onNewDelivery: () => void;
+  onOpenProject: (id: string) => void;
+  onDeleteProject: (id: string) => void;
+  onExportMd: (id: string) => void;
+  onExportJson: (id: string) => void;
+}
+
+export function Dashboard({
+  analytics,
+  projects,
+  loading,
+  serverOk,
+  onNewProject,
+  onNewDelivery,
+  onOpenProject,
+  onDeleteProject,
+  onExportMd,
+  onExportJson,
+}: Props) {
+  const a = analytics;
+  const compliancePct = a && a.compliance.total > 0 ? Math.round((a.compliance.met / a.compliance.total) * 100) : 0;
+  const prePct = a && a.totalProjects > 0 ? Math.round((a.preAppointment / a.totalProjects) * 100) : 0;
+  const delPct = a && a.totalProjects > 0 ? Math.round((a.delivery / a.totalProjects) * 100) : 0;
+  const maxActivity = a && a.activity.length ? Math.max(...a.activity.map((x) => x.count)) : 1;
+
+  return (
+    <div className="dash">
+      {/* Hero */}
+      <header className="dash-hero">
+        <div className="dash-hero-glow" />
+        <div className="dash-hero-inner">
+          <div className="dash-eyebrow">➜ ./bim-execution-plan-studio</div>
+          <h1 className="dash-title">
+            BIM Execution Plan <span className="dash-accent">Studio</span>
+          </h1>
+          <p className="dash-subtitle">
+            Author, version and validate ISO 19650-aligned BIM Execution Plans — a living,
+            collaborative workspace for BIM managers and coordinators.
+          </p>
+          <div className="dash-hero-actions">
+            <button className="btn btn-primary btn-lg" onClick={onNewProject} disabled={!serverOk}>
+              ✦ New project
+            </button>
+            <button className="btn btn-lg" onClick={onNewDelivery} disabled={!serverOk}>
+              Delivery mode
+            </button>
+          </div>
+          {serverOk === false && (
+            <div className="banner-error">⚠ Backend not reachable — persistence is unavailable. Start the API (see README).</div>
+          )}
+        </div>
+      </header>
+
+      {/* KPI cards */}
+      <section className="dash-kpis">
+        <div className="kpi-card">
+          <div className="kpi-value">{a ? a.totalProjects : "—"}</div>
+          <div className="kpi-label">Projects</div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-value">{a ? a.totalVersions : "—"}</div>
+          <div className="kpi-label">Versioned snapshots</div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-value">{a ? `${compliancePct}%` : "—"}</div>
+          <div className="kpi-label">Compliance met</div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-value">{a ? a.preAppointment : "—"}</div>
+          <div className="kpi-label">Pre-appointment</div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-value">{a ? a.delivery : "—"}</div>
+          <div className="kpi-label">Delivery</div>
+        </div>
+      </section>
+
+      {/* Charts */}
+      <section className="dash-charts">
+        <div className="chart-card">
+          <h3>Mode split</h3>
+          {a && a.totalProjects > 0 ? (
+            <div className="bar-row">
+              <div className="bar-seg" style={{ width: `${prePct}%`, background: "var(--accent)" }} title={`Pre-appointment ${prePct}%`} />
+              <div className="bar-seg" style={{ width: `${delPct}%`, background: "var(--accent-2)" }} title={`Delivery ${delPct}%`} />
+            </div>
+          ) : (
+            <p className="muted">No projects yet.</p>
+          )}
+          <div className="bar-legend">
+            <span><i style={{ background: "var(--accent)" }} /> Pre-appointment {prePct}%</span>
+            <span><i style={{ background: "var(--accent-2)" }} /> Delivery {delPct}%</span>
+          </div>
+        </div>
+
+        <div className="chart-card">
+          <h3>Compliance</h3>
+          {a && a.compliance.total > 0 ? (
+            <div className="ring-wrap">
+              <div className="ring" style={{ background: `conic-gradient(var(--ok) ${compliancePct}%, var(--bg-3) 0)` }}>
+                <div className="ring-inner">{compliancePct}%</div>
+              </div>
+              <p className="muted">{a.compliance.met} of {a.compliance.total} checklist items met</p>
+            </div>
+          ) : (
+            <p className="muted">No data yet.</p>
+          )}
+        </div>
+
+        <div className="chart-card chart-card-wide">
+          <h3>Activity — last 7 days</h3>
+          {a && a.activity.length > 0 ? (
+            <div className="activity-bars">
+              {a.activity.map((d) => (
+                <div key={d.day} className="activity-col" title={`${d.day}: ${d.count}`}>
+                  <div className="activity-bar" style={{ height: `${(d.count / maxActivity) * 100}%` }} />
+                  <span className="activity-day">{d.day.slice(5)}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="muted">No activity in the last 7 days.</p>
+          )}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="dash-how">
+        <h2>How it works</h2>
+        <div className="how-grid">
+          <div className="how-step">
+            <span className="how-num">01</span>
+            <h4>Create</h4>
+            <p>Start from a template or blank, guided by a 14-section wizard covering every part of a BEP.</p>
+          </div>
+          <div className="how-step">
+            <span className="how-num">02</span>
+            <h4>Author</h4>
+            <p>Fill in goals, roles, data exchange, LOD, milestones and more — with predefined options and inline help.</p>
+          </div>
+          <div className="how-step">
+            <span className="how-num">03</span>
+            <h4>Validate</h4>
+            <p>Live ISO 19650 / NBIMS compliance and validation checks flag gaps as you work.</p>
+          </div>
+          <div className="how-step">
+            <span className="how-num">04</span>
+            <h4>Version & export</h4>
+            <p>Commit immutable revisions, then export to Markdown (→ DOCX/PDF) or a machine-readable .bep bundle.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Recent projects */}
+      <section className="dash-projects">
+        <h2>Recent projects</h2>
+        {projects.length === 0 && !loading && <p className="muted">No projects yet. Create one to begin.</p>}
+        {projects.length === 0 && loading && <p className="muted">Loading projects…</p>}
+        {projects.map((p) => (
+          <div key={p.id} className="project-row">
+            <div>
+              <strong>{p.name}</strong>
+              <div className="project-meta">
+                <span className="pill pill-mode">{p.mode}</span>
+                <span className="pill">Rev {p.revision}</span>
+                <span className="pill">{p.versionCount} {p.versionCount === 1 ? "version" : "versions"}</span>
+              </div>
+              <div className="muted">Updated {new Date(p.updatedAt).toLocaleString()}</div>
+            </div>
+            <div className="row gap">
+              <button className="btn btn-ghost" title="Export markdown" onClick={() => onExportMd(p.id)}>Export</button>
+              <button className="btn btn-ghost" title="Download .bep JSON" onClick={() => onExportJson(p.id)}>.bep</button>
+              <button className="btn btn-ghost" title="Delete project" onClick={() => onDeleteProject(p.id)}>✕</button>
+              <button className="btn btn-primary" onClick={() => onOpenProject(p.id)} disabled={loading}>Edit</button>
+            </div>
+          </div>
+        ))}
+      </section>
+    </div>
+  );
+}

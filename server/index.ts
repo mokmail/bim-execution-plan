@@ -47,6 +47,61 @@ app.get("/api/health", async (_req, res) => {
   }
 });
 
+// ---------- Analytics ----------
+app.get("/api/analytics", async (_req, res) => {
+  try {
+    const totals = await pool.query(
+      `SELECT COUNT(*)::int AS total,
+              COUNT(*) FILTER (WHERE mode = 'pre-appointment')::int AS pre,
+              COUNT(*) FILTER (WHERE mode = 'delivery')::int AS delivery,
+              COALESCE(SUM((SELECT COUNT(*) FROM bep_versions v WHERE v.project_id = p.id)), 0)::int AS total_versions
+       FROM bep_projects p`,
+    );
+    const t = totals.rows[0];
+
+    // Compliance: count met items across all projects (9-item checklist).
+    const projects = await pool.query("SELECT current FROM bep_projects");
+    let met = 0;
+    let total = 0;
+    for (const r of projects.rows) {
+      const doc = r.current;
+      if (!doc) continue;
+      const checks = [
+        doc.mode === "pre-appointment" || doc.mode === "delivery",
+        (doc.responsibilities?.roles?.length ?? 0) > 0,
+        (doc.collaboration?.cdePlatform ?? "").trim().length > 0,
+        (doc.delivery?.milestones?.length ?? 0) > 0,
+        (doc.dataExchange?.exchanges?.length ?? 0) > 0,
+        (doc.security?.standard ?? "").trim().length > 0,
+        (doc.lod?.matrix?.length ?? 0) > 0,
+        (doc.qualityControl?.validationProcedure ?? "").trim().length > 0,
+        (doc.bimGoals?.goals?.length ?? 0) > 0,
+      ];
+      total += checks.length;
+      met += checks.filter(Boolean).length;
+    }
+
+    // Activity: last 7 days of project updates.
+    const activity = await pool.query(
+      `SELECT to_char(updated_at, 'YYYY-MM-DD') AS day, COUNT(*)::int AS count
+       FROM bep_projects
+       WHERE updated_at >= now() - interval '7 days'
+       GROUP BY day ORDER BY day`,
+    );
+
+    res.json({
+      totalProjects: t.total,
+      preAppointment: t.pre,
+      delivery: t.delivery,
+      totalVersions: t.total_versions,
+      compliance: { met, total },
+      activity: activity.rows.map((r) => ({ day: r.day, count: r.count })),
+    });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ---------- Projects ----------
 app.get("/api/projects", async (_req, res) => {
   const { rows } = await pool.query(

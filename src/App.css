@@ -180,6 +180,64 @@ h4 { font-size: 0.9rem; color: var(--accent); margin-top: 1.2em; }
 }
 .author-input { max-width: 150px; }
 
+/* ---------- Dashboard ---------- */
+.dash-app { min-height: 100vh; }
+.dash { max-width: 1100px; margin: 0 auto; padding: 32px 24px 60px; }
+.dash-hero {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--border); border-radius: 16px;
+  background: var(--bg-2); padding: 48px 40px; margin-bottom: 28px;
+}
+.dash-hero-glow {
+  position: absolute; top: -120px; right: -80px; width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(79,142,247,0.18), transparent 70%);
+  pointer-events: none;
+}
+.dash-hero-inner { position: relative; }
+.dash-eyebrow { font-family: ui-monospace, monospace; color: var(--accent); font-size: 0.85rem; margin-bottom: 12px; }
+.dash-title { font-size: 2.6rem; font-weight: 700; margin: 0 0 12px; line-height: 1.1; }
+.dash-accent { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.dash-subtitle { color: var(--muted); font-size: 1.05rem; max-width: 620px; margin: 0 0 24px; line-height: 1.5; }
+.dash-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-lg { padding: 12px 22px; font-size: 0.95rem; }
+
+.dash-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.kpi-card {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; text-align: center;
+}
+.kpi-value { font-size: 2rem; font-weight: 700; color: var(--accent); }
+.kpi-label { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+.dash-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.chart-card {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+}
+.chart-card h3 { margin-top: 0; }
+.chart-card-wide { grid-column: span 2; }
+.bar-row { display: flex; height: 22px; border-radius: 6px; overflow: hidden; background: var(--bg-3); margin: 12px 0 8px; }
+.bar-seg { height: 100%; transition: width 0.6s ease; }
+.bar-legend { display: flex; gap: 18px; font-size: 0.8rem; color: var(--muted); }
+.bar-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }
+.ring-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 8px 0; }
+.ring { width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.ring-inner { width: 88px; height: 88px; border-radius: 50%; background: var(--bg-2); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 700; color: var(--ok); }
+.activity-bars { display: flex; align-items: flex-end; gap: 10px; height: 120px; padding-top: 8px; }
+.activity-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+.activity-bar { width: 100%; max-width: 40px; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.5s ease; }
+.activity-day { font-size: 0.7rem; color: var(--muted); }
+
+.dash-how { margin-bottom: 28px; }
+.dash-how h2 { font-size: 1.4rem; margin-bottom: 18px; }
+.how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.how-step { background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.how-num { font-family: ui-monospace, monospace; color: var(--accent); font-size: 0.9rem; }
+.how-step h4 { margin: 8px 0 6px; font-size: 1rem; }
+.how-step p { color: var(--muted); font-size: 0.88rem; line-height: 1.5; margin: 0; }
+
+.dash-projects h2 { font-size: 1.4rem; margin-bottom: 14px; }
+.dash-import { max-width: 1100px; margin: 0 auto; padding: 0 24px 40px; }
+
 /* ---------- Layout ---------- */
 .app { min-height: 100vh; }
 .projects-view { padding: 32px; max-width: 1000px; margin: 0 auto; }

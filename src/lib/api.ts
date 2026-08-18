@@ -71,6 +71,19 @@ export async function healthApi(): Promise<{ status: string }> {
   return request<{ status: string }>("/health");
 }
 
+export interface Analytics {
+  totalProjects: number;
+  preAppointment: number;
+  delivery: number;
+  totalVersions: number;
+  compliance: { met: number; total: number };
+  activity: { day: string; count: number }[];
+}
+
+export async function analyticsApi(): Promise<Analytics> {
+  return request<Analytics>("/analytics");
+}
+
 // Derive a stable project id (slug) from a name — must match server slug().
 export function projectIdFromName(name: string): string {
   return (
