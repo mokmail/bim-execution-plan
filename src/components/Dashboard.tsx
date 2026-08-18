@@ -1,6 +1,11 @@
 import type { Analytics } from "../lib/api";
 import type { ProjectMeta } from "../lib/api";
 
+// Skeleton shimmer placeholder for loading states (ui-ux-pro-max: loading feedback).
+function Skeleton() {
+  return <span className="skeleton" aria-hidden="true" />;
+}
+
 interface Props {
   analytics: Analytics | null;
   projects: ProjectMeta[];
@@ -61,52 +66,54 @@ export function Dashboard({
       </header>
 
       {/* KPI cards */}
-      <section className="dash-kpis">
+      <section className="dash-kpis" aria-label="Project metrics">
         <div className="kpi-card">
-          <div className="kpi-value">{a ? a.totalProjects : "—"}</div>
+          <div className="kpi-value kpi-num">{a ? a.totalProjects : <Skeleton />}</div>
           <div className="kpi-label">Projects</div>
         </div>
         <div className="kpi-card">
-          <div className="kpi-value">{a ? a.totalVersions : "—"}</div>
+          <div className="kpi-value kpi-num">{a ? a.totalVersions : <Skeleton />}</div>
           <div className="kpi-label">Versioned snapshots</div>
         </div>
         <div className="kpi-card">
-          <div className="kpi-value">{a ? `${compliancePct}%` : "—"}</div>
+          <div className="kpi-value kpi-num kpi-accent">{a ? `${compliancePct}%` : <Skeleton />}</div>
           <div className="kpi-label">Compliance met</div>
         </div>
         <div className="kpi-card">
-          <div className="kpi-value">{a ? a.preAppointment : "—"}</div>
+          <div className="kpi-value kpi-num">{a ? a.preAppointment : <Skeleton />}</div>
           <div className="kpi-label">Pre-appointment</div>
         </div>
         <div className="kpi-card">
-          <div className="kpi-value">{a ? a.delivery : "—"}</div>
+          <div className="kpi-value kpi-num">{a ? a.delivery : <Skeleton />}</div>
           <div className="kpi-label">Delivery</div>
         </div>
       </section>
 
       {/* Charts */}
-      <section className="dash-charts">
+      <section className="dash-charts" aria-label="Project analytics">
         <div className="chart-card">
           <h3>Mode split</h3>
           {a && a.totalProjects > 0 ? (
-            <div className="bar-row">
-              <div className="bar-seg" style={{ width: `${prePct}%`, background: "var(--accent)" }} title={`Pre-appointment ${prePct}%`} />
-              <div className="bar-seg" style={{ width: `${delPct}%`, background: "var(--accent-2)" }} title={`Delivery ${delPct}%`} />
-            </div>
+            <>
+              <div className="bar-row" role="img" aria-label={`Mode split: ${prePct}% pre-appointment, ${delPct}% delivery`}>
+                <div className="bar-seg" style={{ width: `${prePct}%`, background: "var(--accent)" }} title={`Pre-appointment ${prePct}%`} />
+                <div className="bar-seg" style={{ width: `${delPct}%`, background: "var(--accent-2)" }} title={`Delivery ${delPct}%`} />
+              </div>
+              <div className="bar-legend">
+                <span><i style={{ background: "var(--accent)" }} /> Pre-appointment {prePct}%</span>
+                <span><i style={{ background: "var(--accent-2)" }} /> Delivery {delPct}%</span>
+              </div>
+            </>
           ) : (
             <p className="muted">No projects yet.</p>
           )}
-          <div className="bar-legend">
-            <span><i style={{ background: "var(--accent)" }} /> Pre-appointment {prePct}%</span>
-            <span><i style={{ background: "var(--accent-2)" }} /> Delivery {delPct}%</span>
-          </div>
         </div>
 
         <div className="chart-card">
           <h3>Compliance</h3>
           {a && a.compliance.total > 0 ? (
             <div className="ring-wrap">
-              <div className="ring" style={{ background: `conic-gradient(var(--ok) ${compliancePct}%, var(--bg-3) 0)` }}>
+              <div className="ring" role="img" aria-label={`Compliance ${compliancePct}%`} style={{ background: `conic-gradient(var(--ok) ${compliancePct}%, var(--bg-3) 0)` }}>
                 <div className="ring-inner">{compliancePct}%</div>
               </div>
               <p className="muted">{a.compliance.met} of {a.compliance.total} checklist items met</p>
@@ -119,7 +126,7 @@ export function Dashboard({
         <div className="chart-card chart-card-wide">
           <h3>Activity — last 7 days</h3>
           {a && a.activity.length > 0 ? (
-            <div className="activity-bars">
+            <div className="activity-bars" role="img" aria-label="Project updates over the last 7 days">
               {a.activity.map((d) => (
                 <div key={d.day} className="activity-col" title={`${d.day}: ${d.count}`}>
                   <div className="activity-bar" style={{ height: `${(d.count / maxActivity) * 100}%` }} />
