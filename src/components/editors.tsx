@@ -130,7 +130,7 @@ export function ProjectInformationEditor({ doc, setDoc }: { doc: BepDocument; se
   return (
     <div className="grid">
       <Field label="Project number"><TextField value={p.projectNumber} onChange={(v) => up({ projectNumber: v })} /></Field>
-      <Field label="Project name"><TextField value={p.projectName} onChange={(v) => { up({ projectName: v }); }} /></Field>
+      <Field label="Project name"><TextField value={p.projectName} onChange={(v) => setDoc((x) => ({ ...x, projectName: v, projectInformation: { ...x.projectInformation, projectName: v } }))} /></Field>
       <Field label="Owner / client"><TextField value={p.owner} onChange={(v) => up({ owner: v })} /></Field>
       <Field label="Location"><TextField value={p.location} onChange={(v) => up({ location: v })} /></Field>
       <Field label="Sector">
