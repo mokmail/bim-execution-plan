@@ -1,0 +1,487 @@
+import type { BepDocument, SoftwareItem } from "../types/bep";
+import { Field, TextField, TextArea, Select, Checkbox, AddButton, RemoveButton } from "./ui";
+
+// Generic helper to update a BepDocument immutably.
+type SetDoc = (updater: (d: BepDocument) => BepDocument) => void;
+
+function uid(prefix: string): string {
+  return `${prefix}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+// ---------- 1. Document Control ----------
+export function DocumentControlEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const d = doc.documentControl;
+  const up = (patch: Partial<typeof d>) =>
+    setDoc((x) => ({ ...x, documentControl: { ...x.documentControl, ...patch } }));
+  return (
+    <div className="grid">
+      <Field label="Document number">
+        <TextField value={d.documentNumber} onChange={(v) => up({ documentNumber: v })} />
+      </Field>
+      <Field label="Revision">
+        <TextField value={d.revision} onChange={(v) => up({ revision: v })} />
+      </Field>
+      <Field label="Status">
+        <Select
+          value={d.status}
+          onChange={(v) => up({ status: v })}
+          options={[
+            { value: "draft", label: "Draft" },
+            { value: "for-review", label: "For review" },
+            { value: "approved", label: "Approved" },
+            { value: "superseded", label: "Superseded" },
+          ]}
+        />
+      </Field>
+      <Field label="Author">
+        <TextField value={d.author} onChange={(v) => up({ author: v })} />
+      </Field>
+      <Field label="Approver">
+        <TextField value={d.approver} onChange={(v) => up({ approver: v })} />
+      </Field>
+      <Field label="Distribution">
+        <TextField value={d.distribution} onChange={(v) => up({ distribution: v })} />
+      </Field>
+      <Field label="Canonical location (CDE link)" hint="Single source of truth — a key anti-failure practice.">
+        <TextField value={d.canonicalLocation} onChange={(v) => up({ canonicalLocation: v })} />
+      </Field>
+      {d.changes.length > 0 && (
+        <div className="full">
+          <h4>Change history</h4>
+          <table className="table">
+            <thead>
+              <tr><th>Date</th><th>Version</th><th>Description</th><th>Author</th></tr>
+            </thead>
+            <tbody>
+              {d.changes.map((c, i) => (
+                <tr key={i}><td>{c.date}</td><td>{c.version}</td><td>{c.description}</td><td>{c.author}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- 2. Project Information ----------
+export function ProjectInformationEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const p = doc.projectInformation;
+  const up = (patch: Partial<typeof p>) =>
+    setDoc((x) => ({ ...x, projectInformation: { ...x.projectInformation, ...patch } }));
+  return (
+    <div className="grid">
+      <Field label="Project number"><TextField value={p.projectNumber} onChange={(v) => up({ projectNumber: v })} /></Field>
+      <Field label="Project name"><TextField value={p.projectName} onChange={(v) => { up({ projectName: v }); }} /></Field>
+      <Field label="Owner / client"><TextField value={p.owner} onChange={(v) => up({ owner: v })} /></Field>
+      <Field label="Location"><TextField value={p.location} onChange={(v) => up({ location: v })} /></Field>
+      <Field label="Sector"><TextField value={p.sector} onChange={(v) => up({ sector: v })} /></Field>
+      <Field label="Delivery method">
+        <Select
+          value={p.deliveryMethod || "DBB"}
+          onChange={(v) => up({ deliveryMethod: v })}
+          options={[
+            { value: "DBB", label: "Design-Bid-Build (DBB)" },
+            { value: "DB", label: "Design-Build (DB)" },
+            { value: "IPD", label: "Integrated Project Delivery (IPD)" },
+            { value: "CM", label: "Construction Manager (CM)" },
+            { value: "Other", label: "Other" },
+          ]}
+        />
+      </Field>
+      <Field label="Contract route"><TextField value={p.contractRoute} onChange={(v) => up({ contractRoute: v })} /></Field>
+      <Field label="Start date"><TextField value={p.startDate} onChange={(v) => up({ startDate: v })} /></Field>
+      <Field label="End date"><TextField value={p.endDate} onChange={(v) => up({ endDate: v })} /></Field>
+      <Field label="Duration / key dates"><TextField value={p.duration} onChange={(v) => up({ duration: v })} /></Field>
+      <div className="full">
+        <Field label="Project description"><TextArea value={p.description} onChange={(v) => up({ description: v })} /></Field>
+      </div>
+    </div>
+  );
+}
+
+// ---------- 3. BIM Goals & Uses ----------
+export function BimGoalsEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const g = doc.bimGoals;
+  const setGoals = (goals: string[]) => setDoc((x) => ({ ...x, bimGoals: { ...x.bimGoals, goals } }));
+  const setUses = (uses: typeof g.uses) => setDoc((x) => ({ ...x, bimGoals: { ...x.bimGoals, uses } }));
+  return (
+    <div>
+      <h4>Project BIM goals</h4>
+      {g.goals.map((goal, i) => (
+        <div key={i} className="row">
+          <TextField value={goal} onChange={(v) => setGoals(g.goals.map((x, j) => (j === i ? v : x)))} />
+          <RemoveButton onClick={() => setGoals(g.goals.filter((_, j) => j !== i))} />
+        </div>
+      ))}
+      <AddButton label="Add goal" onClick={() => setGoals([...g.goals, ""])} />
+      <h4>BIM Uses</h4>
+      {g.uses.length === 0 && <p className="muted">No BIM uses yet.</p>}
+      {g.uses.map((u) => (
+        <div key={u.id} className="card">
+          <div className="row">
+            <Field label="BIM Use name"><TextField value={u.name} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, name: v } : x))} /></Field>
+            <Field label="Phase">
+              <Select value={u.phase} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, phase: v } : x))}
+                options={[
+                  { value: "planning", label: "Planning" },
+                  { value: "design", label: "Design" },
+                  { value: "construction", label: "Construction" },
+                  { value: "operations", label: "Operations" },
+                ]} />
+            </Field>
+            <Field label="Priority">
+              <Select value={u.priority} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, priority: v } : x))}
+                options={[
+                  { value: "high", label: "High" },
+                  { value: "medium", label: "Medium" },
+                  { value: "low", label: "Low" },
+                ]} />
+            </Field>
+            <RemoveButton onClick={() => setUses(g.uses.filter((x) => x.id !== u.id))} />
+          </div>
+          <Field label="Responsible party"><TextField value={u.responsibleParty} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, responsibleParty: v } : x))} /></Field>
+          <Field label="Competence required"><TextField value={u.competence} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, competence: v } : x))} /></Field>
+          <Field label="Gaps / deficiencies"><TextArea rows={2} value={u.gaps} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, gaps: v } : x))} /></Field>
+        </div>
+      ))}
+      <AddButton label="Add BIM Use" onClick={() => setUses([...g.uses, { id: uid("use"), name: "", description: "", phase: "design", responsibleParty: "", priority: "medium", competence: "", gaps: "" }])} />
+    </div>
+  );
+}
+
+// ---------- 4. Roles & Responsibilities ----------
+export function RolesEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const r = doc.responsibilities;
+  const setRoles = (roles: typeof r.roles) => setDoc((x) => ({ ...x, responsibilities: { ...x.responsibilities, roles } }));
+  const setRaci = (raci: typeof r.raci) => setDoc((x) => ({ ...x, responsibilities: { ...x.responsibilities, raci } }));
+  const setActivities = (a: string[]) => setDoc((x) => ({ ...x, responsibilities: { ...x.responsibilities, raciActivities: a } }));
+  return (
+    <div>
+      <h4>Team roles</h4>
+      {r.roles.map((role) => (
+        <div key={role.id} className="card">
+          <div className="row">
+            <Field label="Role"><TextField value={role.role} onChange={(v) => setRoles(r.roles.map((x) => x.id === role.id ? { ...x, role: v } : x))} /></Field>
+            <Field label="Person"><TextField value={role.person} onChange={(v) => setRoles(r.roles.map((x) => x.id === role.id ? { ...x, person: v } : x))} /></Field>
+            <Field label="Organization"><TextField value={role.organization} onChange={(v) => setRoles(r.roles.map((x) => x.id === role.id ? { ...x, organization: v } : x))} /></Field>
+            <RemoveButton onClick={() => setRoles(r.roles.filter((x) => x.id !== role.id))} />
+          </div>
+          <div className="row">
+            <Field label="Email"><TextField value={role.email} onChange={(v) => setRoles(r.roles.map((x) => x.id === role.id ? { ...x, email: v } : x))} /></Field>
+            <div className="field">
+              <span className="field-label">Dedicated role</span>
+              <Checkbox checked={role.dedicated} onChange={(v) => setRoles(r.roles.map((x) => x.id === role.id ? { ...x, dedicated: v } : x))} label="Dedicated" />
+            </div>
+          </div>
+          <Field label="Scope of responsibility"><TextArea rows={2} value={role.scope} onChange={(v) => setRoles(r.roles.map((x) => x.id === role.id ? { ...x, scope: v } : x))} /></Field>
+        </div>
+      ))}
+      <AddButton label="Add role" onClick={() => setRoles([...r.roles, { id: uid("role"), role: "", person: "", organization: "", email: "", scope: "", dedicated: false }])} />
+      {r.roles.length > 0 && (
+        <>
+          <h4>RACI matrix</h4>
+          <Field label="Activities (one per line)">
+            <TextArea value={r.raciActivities.join("\n")} rows={4} onChange={(v) => setActivities(v.split("\n").map((s) => s.trim()).filter(Boolean))} />
+          </Field>
+          {r.raciActivities.length > 0 && (
+            <table className="table">
+              <thead>
+                <tr><th>Activity</th>{r.roles.map((role) => <th key={role.id}>{role.role}</th>)}</tr>
+              </thead>
+              <tbody>
+                {r.raciActivities.map((act) => (
+                  <tr key={act}>
+                    <td>{act}</td>
+                    {r.roles.map((role) => {
+                      const val = (r.raci[act] || {})[role.id] || "–";
+                      return (
+                        <td key={role.id}>
+                          <select
+                            className="input raci-input"
+                            value={val}
+                            onChange={(e) => setRaci({
+                              ...r.raci,
+                              [act]: { ...(r.raci[act] || {}), [role.id]: e.target.value as any },
+                            })}
+                          >
+                            {["R", "A", "C", "I", "–"].map((x) => <option key={x} value={x}>{x}</option>)}
+                          </select>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ---------- 5. Collaboration ----------
+export function CollaborationEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const c = doc.collaboration;
+  const up = (patch: Partial<typeof c>) => setDoc((x) => ({ ...x, collaboration: { ...x.collaboration, ...patch } }));
+  return (
+    <div className="grid">
+      <Field label="CDE platform"><TextField value={c.cdePlatform} onChange={(v) => up({ cdePlatform: v })} /></Field>
+      <Field label="Naming convention"><TextField value={c.namingConvention} onChange={(v) => up({ namingConvention: v })} /></Field>
+      <div className="full">
+        <Field label="Workflow states"><TextField value={c.workflowStates} onChange={(v) => up({ workflowStates: v })} /></Field>
+      </div>
+      <div className="full"><Field label="File/folder structure"><TextArea value={c.fileStructure} onChange={(v) => up({ fileStructure: v })} /></Field></div>
+      <Field label="Transition authority"><TextField value={c.transitionAuthority} onChange={(v) => up({ transitionAuthority: v })} /></Field>
+      <Field label="Meeting cadence"><TextField value={c.meetingCadence} onChange={(v) => up({ meetingCadence: v })} /></Field>
+      <Field label="Communication channels"><TextField value={c.communicationChannels} onChange={(v) => up({ communicationChannels: v })} /></Field>
+      <div className="full"><Field label="Escalation procedure"><TextArea value={c.escalationProcedure} onChange={(v) => up({ escalationProcedure: v })} /></Field></div>
+    </div>
+  );
+}
+
+// ---------- 6. Data Exchange ----------
+export function DataExchangeEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const d = doc.dataExchange;
+  const up = (patch: Partial<typeof d>) => setDoc((x) => ({ ...x, dataExchange: { ...x.dataExchange, ...patch } }));
+  const setExchanges = (exchanges: typeof d.exchanges) => setDoc((x) => ({ ...x, dataExchange: { ...x.dataExchange, exchanges } }));
+  return (
+    <div>
+      <div className="row">
+        <Field label="IFC version">
+          <Select value={d.ifcVersion || "IFC 4"} onChange={(v) => up({ ifcVersion: v })}
+            options={[
+              { value: "IFC 2x3", label: "IFC 2x3" },
+              { value: "IFC 4", label: "IFC 4" },
+              { value: "IFC 4.3", label: "IFC 4.3" },
+            ]} />
+        </Field>
+        <Field label="Model View Definition (MVD)"><TextField value={d.mvd} onChange={(v) => up({ mvd: v })} /></Field>
+      </div>
+      <h4>Information exchanges</h4>
+      {d.exchanges.length === 0 && <p className="muted">No exchanges defined yet.</p>}
+      {d.exchanges.map((e) => (
+        <div key={e.id} className="card">
+          <div className="row">
+            <Field label="Name"><TextField value={e.name} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, name: v } : x))} /></Field>
+            <Field label="Format">
+              <Select value={e.format || "IFC"} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, format: v } : x))}
+                options={[
+                  { value: "IFC", label: "IFC" },
+                  { value: "COBie", label: "COBie" },
+                  { value: "BCF", label: "BCF" },
+                  { value: "IDS", label: "IDS" },
+                  { value: "Native", label: "Native" },
+                  { value: "Other", label: "Other" },
+                ]} />
+            </Field>
+            <Field label="Version"><TextField value={e.formatVersion} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, formatVersion: v } : x))} /></Field>
+            <RemoveButton onClick={() => setExchanges(d.exchanges.filter((x) => x.id !== e.id))} />
+          </div>
+          <div className="row">
+            <Field label="Recipient"><TextField value={e.recipient} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, recipient: v } : x))} /></Field>
+            <Field label="Level of detail"><TextField value={e.levelOfDetail} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, levelOfDetail: v } : x))} /></Field>
+            <Field label="Responsible author"><TextField value={e.responsibleAuthor} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, responsibleAuthor: v } : x))} /></Field>
+          </div>
+        </div>
+      ))}
+      <AddButton label="Add exchange" onClick={() => setExchanges([...d.exchanges, { id: uid("ex"), name: "", format: "IFC", formatVersion: "", recipient: "", levelOfDetail: "", responsibleAuthor: "" }])} />
+    </div>
+  );
+}
+
+// ---------- 7. Software & Hardware ----------
+function SoftwareList({
+  title,
+  items,
+  onChange,
+}: {
+  title: string;
+  items: SoftwareItem[];
+  onChange: (items: SoftwareItem[]) => void;
+}) {
+  return (
+    <div>
+      <h4>{title}</h4>
+      {items.map((s) => (
+        <div key={s.id} className="row">
+          <TextField value={s.discipline} placeholder="Discipline" onChange={(v) => onChange(items.map((x) => x.id === s.id ? { ...x, discipline: v } : x))} />
+          <TextField value={s.software} placeholder="Software" onChange={(v) => onChange(items.map((x) => x.id === s.id ? { ...x, software: v } : x))} />
+          <TextField value={s.version} placeholder="Version" onChange={(v) => onChange(items.map((x) => x.id === s.id ? { ...x, version: v } : x))} />
+          <RemoveButton onClick={() => onChange(items.filter((x) => x.id !== s.id))} />
+        </div>
+      ))}
+      <AddButton label={`Add ${title.toLowerCase()}`} onClick={() => onChange([...items, { id: uid("sw"), discipline: "", software: "", version: "", purpose: "" }])} />
+    </div>
+  );
+}
+
+export function SoftwareEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const s = doc.software;
+  const set = (patch: Partial<typeof s>) => setDoc((x) => ({ ...x, software: { ...x.software, ...patch } }));
+  return (
+    <div>
+      <SoftwareList title="Authoring software" items={s.authoring} onChange={(items) => set({ authoring: items })} />
+      <SoftwareList title="Coordination / clash detection" items={s.coordination} onChange={(items) => set({ coordination: items })} />
+      <SoftwareList title="Analysis / simulation" items={s.analysis} onChange={(items) => set({ analysis: items })} />
+      <div className="full"><Field label="Hardware requirements"><TextArea value={s.hardware} onChange={(v) => set({ hardware: v })} /></Field></div>
+    </div>
+  );
+}
+
+// ---------- 8. Standards & Conventions ----------
+export function StandardsEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const st = doc.standards;
+  const up = (patch: Partial<typeof st>) => setDoc((x) => ({ ...x, standards: { ...x.standards, ...patch } }));
+  return (
+    <div className="grid">
+      <div className="full"><Field label="Applicable standards"><TextArea value={st.standards} onChange={(v) => up({ standards: v })} /></Field></div>
+      <Field label="Classification system">
+        <Select value={st.classification || "Uniclass"} onChange={(v) => up({ classification: v })}
+          options={[
+            { value: "Uniclass", label: "Uniclass (UK)" },
+            { value: "OmniClass", label: "OmniClass (US)" },
+            { value: "Uniformat II", label: "Uniformat II" },
+            { value: "MasterFormat", label: "MasterFormat" },
+          ]} />
+      </Field>
+      <Field label="Units"><TextField value={st.units} onChange={(v) => up({ units: v })} /></Field>
+      <Field label="Coordinates / geolocation"><TextField value={st.coordinates} onChange={(v) => up({ coordinates: v })} /></Field>
+      <div className="full"><Field label="Naming conventions"><TextArea value={st.namingConventions} onChange={(v) => up({ namingConventions: v })} /></Field></div>
+      <div className="full"><Field label="Property sets / data templates"><TextArea value={st.propertySets} onChange={(v) => up({ propertySets: v })} /></Field></div>
+    </div>
+  );
+}
+
+// ---------- 9. Level of Development ----------
+export function LodEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const l = doc.lod;
+  const up = (patch: Partial<typeof l>) => setDoc((x) => ({ ...x, lod: { ...x.lod, ...patch } }));
+  const setMatrix = (matrix: typeof l.matrix) => setDoc((x) => ({ ...x, lod: { ...x.lod, matrix } }));
+  return (
+    <div>
+      <div className="row">
+        <Field label="LOD specification">
+          <Select value={l.specification || "BIMForum"} onChange={(v) => up({ specification: v })}
+            options={[
+              { value: "BIMForum LOD Specification", label: "BIMForum LOD" },
+              { value: "NBS LOD", label: "NBS LOD 2-5" },
+            ]} />
+        </Field>
+        <Field label="LOIN framework"><TextField value={l.loinFramework} onChange={(v) => up({ loinFramework: v })} /></Field>
+      </div>
+      <h4>LOD / LOIN matrix</h4>
+      {l.matrix.length === 0 && <p className="muted">No matrix entries yet.</p>}
+      {l.matrix.map((row) => (
+        <div key={row.id} className="row">
+          <TextField value={row.element} placeholder="Element / system" onChange={(v) => setMatrix(l.matrix.map((x) => x.id === row.id ? { ...x, element: v } : x))} />
+          <TextField value={row.stage} placeholder="Stage" onChange={(v) => setMatrix(l.matrix.map((x) => x.id === row.id ? { ...x, stage: v } : x))} />
+          <TextField value={row.level} placeholder="LOD / LOIN" onChange={(v) => setMatrix(l.matrix.map((x) => x.id === row.id ? { ...x, level: v } : x))} />
+          <TextField value={row.responsibleParty} placeholder="Responsible" onChange={(v) => setMatrix(l.matrix.map((x) => x.id === row.id ? { ...x, responsibleParty: v } : x))} />
+          <RemoveButton onClick={() => setMatrix(l.matrix.filter((x) => x.id !== row.id))} />
+        </div>
+      ))}
+      <AddButton label="Add matrix row" onClick={() => setMatrix([...l.matrix, { id: uid("lod"), element: "", stage: "", level: "", responsibleParty: "" }])} />
+    </div>
+  );
+}
+
+// ---------- 10. Model Management ----------
+export function ModelManagementEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const m = doc.modelManagement;
+  const up = (patch: Partial<typeof m>) => setDoc((x) => ({ ...x, modelManagement: { ...x.modelManagement, ...patch } }));
+  return (
+    <div className="grid">
+      <Field label="Model breakdown structure"><TextField value={m.breakdown} onChange={(v) => up({ breakdown: v })} /></Field>
+      <Field label="Clash tolerance"><TextField value={m.clashTolerance} onChange={(v) => up({ clashTolerance: v })} /></Field>
+      <div className="full"><Field label="Federation strategy"><TextArea value={m.federationStrategy} onChange={(v) => up({ federationStrategy: v })} /></Field></div>
+      <Field label="Coordination cadence"><TextField value={m.coordinationCadence} onChange={(v) => up({ coordinationCadence: v })} /></Field>
+      <Field label="Model ownership / version control"><TextField value={m.ownership} onChange={(v) => up({ ownership: v })} /></Field>
+      <div className="full"><Field label="BCF issue workflow"><TextArea value={m.bcfWorkflow} onChange={(v) => up({ bcfWorkflow: v })} /></Field></div>
+    </div>
+  );
+}
+
+// ---------- 11. Quality Control ----------
+export function QualityControlEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const q = doc.qualityControl;
+  const up = (patch: Partial<typeof q>) => setDoc((x) => ({ ...x, qualityControl: { ...x.qualityControl, ...patch } }));
+  return (
+    <div className="grid">
+      <div className="full"><Field label="Model validation / checking procedure"><TextArea value={q.validationProcedure} onChange={(v) => up({ validationProcedure: v })} /></Field></div>
+      <div className="full"><Field label="Quality control checklists"><TextArea value={q.checklists} onChange={(v) => up({ checklists: v })} /></Field></div>
+      <Field label="QC responsibility"><TextField value={q.qcResponsibility} onChange={(v) => up({ qcResponsibility: v })} /></Field>
+      <Field label="Audit / review frequency"><TextField value={q.auditFrequency} onChange={(v) => up({ auditFrequency: v })} /></Field>
+      <div className="full"><Field label="Non-conformance / issue resolution"><TextArea value={q.nonConformance} onChange={(v) => up({ nonConformance: v })} /></Field></div>
+      <div className="full"><Field label="Reporting"><TextArea value={q.reporting} onChange={(v) => up({ reporting: v })} /></Field></div>
+    </div>
+  );
+}
+
+// ---------- 12. Delivery ----------
+export function DeliveryEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const d = doc.delivery;
+  const up = (patch: Partial<typeof d>) => setDoc((x) => ({ ...x, delivery: { ...x.delivery, ...patch } }));
+  const setMilestones = (ms: typeof d.milestones) => setDoc((x) => ({ ...x, delivery: { ...x.delivery, milestones: ms } }));
+  return (
+    <div>
+      <Field label="Work stage reference (e.g. RIBA Plan of Work)"><TextField value={d.workStageReference} onChange={(v) => up({ workStageReference: v })} /></Field>
+      <h4>Milestones & information exchanges</h4>
+      {d.milestones.length === 0 && <p className="muted">No milestones yet.</p>}
+      {d.milestones.map((m) => (
+        <div key={m.id} className="card">
+          <div className="row">
+            <Field label="Milestone"><TextField value={m.name} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, name: v } : x))} /></Field>
+            <Field label="Date"><TextField value={m.date} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, date: v } : x))} /></Field>
+            <RemoveButton onClick={() => setMilestones(d.milestones.filter((x) => x.id !== m.id))} />
+          </div>
+          <div className="row">
+            <Field label="Deliverable"><TextField value={m.deliverable} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, deliverable: v } : x))} /></Field>
+            <Field label="Recipient"><TextField value={m.recipient} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, recipient: v } : x))} /></Field>
+            <Field label="Format"><TextField value={m.format} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, format: v } : x))} /></Field>
+          </div>
+          <Field label="Responsible author"><TextField value={m.responsibleAuthor} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, responsibleAuthor: v } : x))} /></Field>
+        </div>
+      ))}
+      <AddButton label="Add milestone" onClick={() => setMilestones([...d.milestones, { id: uid("ms"), name: "", date: "", deliverable: "", recipient: "", format: "", responsibleAuthor: "", notes: "" }])} />
+    </div>
+  );
+}
+
+// ---------- 13. Security ----------
+export function SecurityEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const s = doc.security;
+  const up = (patch: Partial<typeof s>) => setDoc((x) => ({ ...x, security: { ...x.security, ...patch } }));
+  return (
+    <div className="grid">
+      <Field label="Security standard">
+        <Select value={s.standard || "ISO 19650-5"} onChange={(v) => up({ standard: v })}
+          options={[
+            { value: "ISO 19650-5", label: "ISO 19650-5" },
+            { value: "Other", label: "Other" },
+          ]} />
+      </Field>
+      <Field label="Security classification"><TextField value={s.classification} onChange={(v) => up({ classification: v })} /></Field>
+      <div className="full"><Field label="Access control & permissions"><TextArea value={s.accessControl} onChange={(v) => up({ accessControl: v })} /></Field></div>
+      <div className="full"><Field label="Data protection / confidentiality"><TextArea value={s.dataProtection} onChange={(v) => up({ dataProtection: v })} /></Field></div>
+      <div className="full"><Field label="Secure storage & transmission"><TextArea value={s.secureStorage} onChange={(v) => up({ secureStorage: v })} /></Field></div>
+      <div className="full"><Field label="Security responsibilities & incident response"><TextArea value={s.responsibilities} onChange={(v) => up({ responsibilities: v })} /></Field></div>
+    </div>
+  );
+}
+
+// ---------- 14. Training ----------
+export function TrainingEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc }) {
+  const t = doc.training;
+  const up = (patch: Partial<typeof t>) => setDoc((x) => ({ ...x, training: { ...x.training, ...patch } }));
+  return (
+    <div className="grid">
+      <Field label="Training needs assessment"><TextField value={t.needsAssessment} onChange={(v) => up({ needsAssessment: v })} /></Field>
+      <Field label="Competence requirements"><TextField value={t.competencies} onChange={(v) => up({ competencies: v })} /></Field>
+      <div className="full"><Field label="Training plan & schedule"><TextArea value={t.plan} onChange={(v) => up({ plan: v })} /></Field></div>
+      <div className="full"><Field label="Onboarding for new members"><TextArea value={t.onboarding} onChange={(v) => up({ onboarding: v })} /></Field></div>
+      <div className="full"><Field label="Knowledge transfer / lessons learned"><TextArea value={t.lessonsLearned} onChange={(v) => up({ lessonsLearned: v })} /></Field></div>
+    </div>
+  );
+}
