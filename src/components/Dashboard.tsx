@@ -172,25 +172,39 @@ export function Dashboard({
         <h2>Recent projects</h2>
         {projects.length === 0 && !loading && <p className="muted">No projects yet. Create one to begin.</p>}
         {projects.length === 0 && loading && <p className="muted">Loading projects…</p>}
-        {projects.map((p) => (
-          <div key={p.id} className="project-row">
-            <div>
-              <strong>{p.name}</strong>
-              <div className="project-meta">
-                <span className="pill pill-mode">{p.mode}</span>
-                <span className="pill">Rev {p.revision}</span>
-                <span className="pill">{p.versionCount} {p.versionCount === 1 ? "version" : "versions"}</span>
+        {projects.map((p) => {
+          const pct = p.compliance && p.compliance.total > 0 ? Math.round((p.compliance.met / p.compliance.total) * 100) : 0;
+          const recent = Date.now() - new Date(p.updatedAt).getTime() < 24 * 60 * 60 * 1000;
+          return (
+            <div key={p.id} className={`project-row ${recent ? "recent" : ""}`}>
+              <div>
+                <div className="project-name-line">
+                  <strong>{p.name}</strong>
+                  {recent && <span className="pill pill-recent">● recently updated</span>}
+                </div>
+                <div className="project-meta">
+                  <span className="pill pill-mode">{p.mode}</span>
+                  <span className="pill">Rev {p.revision}</span>
+                  <span className="pill">{p.versionCount} {p.versionCount === 1 ? "version" : "versions"}</span>
+                </div>
+                <div className="project-compliance">
+                  <span className="compliance-mini-label">Compliance</span>
+                  <div className="compliance-mini-bar" role="img" aria-label={`Compliance ${pct}%`}>
+                    <div className="compliance-mini-fill" style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="compliance-mini-pct">{pct}%</span>
+                </div>
+                <div className="muted">Updated {new Date(p.updatedAt).toLocaleString()}</div>
               </div>
-              <div className="muted">Updated {new Date(p.updatedAt).toLocaleString()}</div>
+              <div className="row gap">
+                <button className="btn btn-ghost" title="Export markdown" onClick={() => onExportMd(p.id)}>Export</button>
+                <button className="btn btn-ghost" title="Download .bep JSON" onClick={() => onExportJson(p.id)}>.bep</button>
+                <button className="btn btn-ghost" title="Delete project" onClick={() => onDeleteProject(p.id)}>✕</button>
+                <button className="btn btn-primary" onClick={() => onOpenProject(p.id)} disabled={loading}>Edit</button>
+              </div>
             </div>
-            <div className="row gap">
-              <button className="btn btn-ghost" title="Export markdown" onClick={() => onExportMd(p.id)}>Export</button>
-              <button className="btn btn-ghost" title="Download .bep JSON" onClick={() => onExportJson(p.id)}>.bep</button>
-              <button className="btn btn-ghost" title="Delete project" onClick={() => onDeleteProject(p.id)}>✕</button>
-              <button className="btn btn-primary" onClick={() => onOpenProject(p.id)} disabled={loading}>Edit</button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </section>
     </div>
   );

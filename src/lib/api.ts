@@ -29,6 +29,7 @@ export interface ProjectMeta {
   updatedAt: string;
   revision: string;
   versionCount: number;
+  compliance: { met: number; total: number };
 }
 
 // List all saved projects (metadata only).

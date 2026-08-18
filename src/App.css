@@ -259,6 +259,16 @@ h4 { font-size: 0.9rem; color: var(--accent); margin-top: 1.2em; }
 .dash-projects h2 { font-size: 1.4rem; margin-bottom: 14px; }
 .dash-import { max-width: 1100px; margin: 0 auto; padding: 0 24px 40px; }
 
+/* Per-project compliance + recently-updated highlight */
+.project-name-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pill-recent { color: var(--ok); border-color: var(--ok); }
+.project-row.recent { border-left: 3px solid var(--ok); padding-left: 12px; }
+.project-compliance { display: flex; align-items: center; gap: 8px; margin: 6px 0; max-width: 260px; }
+.compliance-mini-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.compliance-mini-bar { flex: 1; height: 6px; border-radius: 3px; background: var(--bg-3); overflow: hidden; }
+.compliance-mini-fill { height: 100%; background: var(--ok); border-radius: 3px; transition: width 0.5s ease; }
+.compliance-mini-pct { font-size: 0.75rem; color: var(--ok); font-variant-numeric: tabular-nums; min-width: 34px; text-align: right; }
+
 /* ---------- Layout ---------- */
 .app { min-height: 100vh; }
 .projects-view { padding: 32px; max-width: 1000px; margin: 0 auto; }

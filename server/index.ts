@@ -32,6 +32,23 @@ function slug(name: string): string {
   );
 }
 
+// 9-item ISO 19650 / NBIMS compliance checklist for a BepDocument.
+function complianceFor(doc: any): { met: number; total: number } {
+  if (!doc) return { met: 0, total: 9 };
+  const checks = [
+    doc.mode === "pre-appointment" || doc.mode === "delivery",
+    (doc.responsibilities?.roles?.length ?? 0) > 0,
+    (doc.collaboration?.cdePlatform ?? "").trim().length > 0,
+    (doc.delivery?.milestones?.length ?? 0) > 0,
+    (doc.dataExchange?.exchanges?.length ?? 0) > 0,
+    (doc.security?.standard ?? "").trim().length > 0,
+    (doc.lod?.matrix?.length ?? 0) > 0,
+    (doc.qualityControl?.validationProcedure ?? "").trim().length > 0,
+    (doc.bimGoals?.goals?.length ?? 0) > 0,
+  ];
+  return { met: checks.filter(Boolean).length, total: checks.length };
+}
+
 async function initDb() {
   const schema = fs.readFileSync(path.join(__dirname, "schema.sql"), "utf8");
   await pool.query(schema);
@@ -64,21 +81,9 @@ app.get("/api/analytics", async (_req, res) => {
     let met = 0;
     let total = 0;
     for (const r of projects.rows) {
-      const doc = r.current;
-      if (!doc) continue;
-      const checks = [
-        doc.mode === "pre-appointment" || doc.mode === "delivery",
-        (doc.responsibilities?.roles?.length ?? 0) > 0,
-        (doc.collaboration?.cdePlatform ?? "").trim().length > 0,
-        (doc.delivery?.milestones?.length ?? 0) > 0,
-        (doc.dataExchange?.exchanges?.length ?? 0) > 0,
-        (doc.security?.standard ?? "").trim().length > 0,
-        (doc.lod?.matrix?.length ?? 0) > 0,
-        (doc.qualityControl?.validationProcedure ?? "").trim().length > 0,
-        (doc.bimGoals?.goals?.length ?? 0) > 0,
-      ];
-      total += checks.length;
-      met += checks.filter(Boolean).length;
+      const c = complianceFor(r.current);
+      met += c.met;
+      total += c.total;
     }
 
     // Activity: last 7 days of project updates.
@@ -107,20 +112,25 @@ app.get("/api/projects", async (_req, res) => {
   const { rows } = await pool.query(
     `SELECT p.id, p.name, p.mode, p.created_at, p.updated_at,
             p.current->'documentControl'->>'revision' AS revision,
+            p.current AS current,
             (SELECT COUNT(*) FROM bep_versions v WHERE v.project_id = p.id) AS version_count
      FROM bep_projects p
      ORDER BY p.updated_at DESC`,
   );
   res.json(
-    rows.map((r) => ({
-      id: r.id,
-      name: r.name,
-      mode: r.mode,
-      updatedAt: r.updated_at,
-      createdAt: r.created_at,
-      revision: r.revision || "0.1",
-      versionCount: Number(r.version_count),
-    })),
+    rows.map((r) => {
+      const c = complianceFor(r.current);
+      return {
+        id: r.id,
+        name: r.name,
+        mode: r.mode,
+        updatedAt: r.updated_at,
+        createdAt: r.created_at,
+        revision: r.revision || "0.1",
+        versionCount: Number(r.version_count),
+        compliance: c,
+      };
+    }),
   );
 });
 
