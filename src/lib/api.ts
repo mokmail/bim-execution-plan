@@ -27,6 +27,8 @@ export interface ProjectMeta {
   mode: string;
   createdAt: string;
   updatedAt: string;
+  revision: string;
+  versionCount: number;
 }
 
 // List all saved projects (metadata only).

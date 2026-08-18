@@ -50,7 +50,11 @@ app.get("/api/health", async (_req, res) => {
 // ---------- Projects ----------
 app.get("/api/projects", async (_req, res) => {
   const { rows } = await pool.query(
-    "SELECT id, name, mode, created_at, updated_at FROM bep_projects ORDER BY updated_at DESC",
+    `SELECT p.id, p.name, p.mode, p.created_at, p.updated_at,
+            p.current->'documentControl'->>'revision' AS revision,
+            (SELECT COUNT(*) FROM bep_versions v WHERE v.project_id = p.id) AS version_count
+     FROM bep_projects p
+     ORDER BY p.updated_at DESC`,
   );
   res.json(
     rows.map((r) => ({
@@ -59,6 +63,8 @@ app.get("/api/projects", async (_req, res) => {
       mode: r.mode,
       updatedAt: r.updated_at,
       createdAt: r.created_at,
+      revision: r.revision || "0.1",
+      versionCount: Number(r.version_count),
     })),
   );
 });
