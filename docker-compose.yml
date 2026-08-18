@@ -1,0 +1,40 @@
+services:
+  app:
+    build: .
+    container_name: bep-studio
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://bep:bep@db:5432/bep
+      PORT: 8080
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - bep-net
+
+  db:
+    image: postgres:16-alpine
+    container_name: bep-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bep
+      POSTGRES_PASSWORD: bep
+      POSTGRES_DB: bep
+    volumes:
+      - bep-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bep -d bep"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - bep-net
+
+volumes:
+  bep-data:
+
+networks:
+  bep-net:
+    driver: bridge

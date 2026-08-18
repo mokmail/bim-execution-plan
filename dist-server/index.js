@@ -1,0 +1,135 @@
+// BIM Execution Plan Studio — Express + PostgreSQL backend.
+// Serves the built frontend (production) and a REST API for persistent
+// BEP storage (replacing browser localStorage).
+import express from "express";
+import cors from "cors";
+import pg from "pg";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PORT = process.env.PORT || 8080;
+const DATABASE_URL = process.env.DATABASE_URL ||
+    "postgres://bep:bep@localhost:5432/bep";
+const pool = new pg.Pool({ connectionString: DATABASE_URL });
+const app = express();
+app.use(cors());
+app.use(express.json({ limit: "2mb" }));
+function slug(name) {
+    return (name
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "untitled");
+}
+async function initDb() {
+    const schema = fs.readFileSync(path.join(__dirname, "schema.sql"), "utf8");
+    await pool.query(schema);
+}
+// ---------- Health ----------
+app.get("/api/health", async (_req, res) => {
+    try {
+        await pool.query("SELECT 1");
+        res.json({ status: "ok" });
+    }
+    catch (e) {
+        res.status(500).json({ status: "error", error: e.message });
+    }
+});
+// ---------- Projects ----------
+app.get("/api/projects", async (_req, res) => {
+    const { rows } = await pool.query("SELECT id, name, mode, created_at, updated_at FROM bep_projects ORDER BY updated_at DESC");
+    res.json(rows.map((r) => ({
+        id: r.id,
+        name: r.name,
+        mode: r.mode,
+        updatedAt: r.updated_at,
+        createdAt: r.created_at,
+    })));
+});
+// GET full bundle (current + changelog)
+app.get("/api/projects/:id", async (req, res) => {
+    const { rows } = await pool.query("SELECT current FROM bep_projects WHERE id = $1", [req.params.id]);
+    if (rows.length === 0)
+        return res.status(404).json({ error: "Not found" });
+    const versions = await pool.query("SELECT version, note, author, created_at, document FROM bep_versions WHERE project_id = $1 ORDER BY created_at DESC", [req.params.id]);
+    res.json({
+        current: rows[0].current,
+        changelog: versions.rows.map((v) => ({
+            version: v.version,
+            note: v.note,
+            author: v.author,
+            date: v.created_at,
+            document: v.document,
+        })),
+    });
+});
+// Upsert a full bundle (create or save). If a revision bump is detected
+// (current.documentControl.revision changed vs stored), log a version.
+app.put("/api/projects/:id", async (req, res) => {
+    const id = req.params.id;
+    const body = req.body;
+    if (!body || !body.current) {
+        return res.status(400).json({ error: "Missing bundle.current" });
+    }
+    const name = body.current.projectName || id;
+    const mode = body.current.mode || "pre-appointment";
+    const revision = body.current.documentControl?.revision || "0.1";
+    const existing = await pool.query("SELECT current FROM bep_projects WHERE id = $1", [id]);
+    await pool.query(`INSERT INTO bep_projects (id, name, mode, current)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (id)
+     DO UPDATE SET name = $2, mode = $3, current = $4, updated_at = now()`, [id, name, mode, JSON.stringify(body.current)]);
+    // Version logging: only when revision is newer than the last stored one.
+    if (existing.rows.length > 0) {
+        const lastRev = existing.rows[0].current?.documentControl?.revision;
+        if (lastRev && lastRev !== revision) {
+            const note = body.note || `Revision ${revision}`;
+            const author = body.author || "unknown";
+            const docForVersion = body.current;
+            await pool.query(`INSERT INTO bep_versions (project_id, version, note, author, document)
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (project_id, version) DO UPDATE SET document = EXCLUDED.document`, [id, revision, note, author, JSON.stringify(docForVersion)]);
+        }
+    }
+    const updated = await pool.query("SELECT id, name, mode, created_at, updated_at FROM bep_projects WHERE id = $1", [id]);
+    res.json(updated.rows[0]);
+});
+// Create a new project with a specific id (slug).
+app.post("/api/projects", async (req, res) => {
+    const body = req.body;
+    if (!body || !body.current) {
+        return res.status(400).json({ error: "Missing bundle.current" });
+    }
+    const id = slug(body.current.projectName || "untitled");
+    const name = body.current.projectName || id;
+    const mode = body.current.mode || "pre-appointment";
+    await pool.query(`INSERT INTO bep_projects (id, name, mode, current)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, current = EXCLUDED.current, updated_at = now()`, [id, name, mode, JSON.stringify(body.current)]);
+    const { rows } = await pool.query("SELECT id, name, mode, created_at, updated_at FROM bep_projects WHERE id = $1", [id]);
+    res.status(201).json(rows[0]);
+});
+app.delete("/api/projects/:id", async (req, res) => {
+    await pool.query("DELETE FROM bep_projects WHERE id = $1", [req.params.id]);
+    res.json({ ok: true });
+});
+// ---------- Serve built frontend (production) ----------
+const distDir = path.join(__dirname, "..", "dist");
+if (fs.existsSync(distDir)) {
+    app.use(express.static(distDir));
+    app.get(/^\/(?!api).*/, (_req, res) => {
+        res.sendFile(path.join(distDir, "index.html"));
+    });
+}
+// ---------- Boot ----------
+async function main() {
+    await initDb();
+    app.listen(PORT, () => {
+        console.log(`BEP backend listening on port ${PORT}`);
+    });
+}
+main().catch((e) => {
+    console.error("Failed to start:", e);
+    process.exit(1);
+});

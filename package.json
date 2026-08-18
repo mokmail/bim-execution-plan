@@ -1,20 +1,29 @@
 {
-  "name": "app",
+  "name": "bim-execution-plan-studio",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && tsc -p server/tsconfig.json && cp server/schema.sql dist-server/schema.sql",
+    "build:web": "tsc -b && vite build",
+    "build:server": "tsc -p server/tsconfig.json && cp server/schema.sql dist-server/schema.sql",
+    "start": "node dist-server/index.js",
     "lint": "oxlint",
     "preview": "vite preview"
   },
   "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "pg": "^8.23.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.0",
     "@types/node": "^24.13.3",
+    "@types/pg": "^8.15.6",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",

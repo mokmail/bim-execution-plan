@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import type { BepDocument, BepBundle, BepMode } from "./types/bep";
 import { emptyDocument } from "./types/bep";
@@ -10,28 +10,34 @@ import {
   downloadFile,
   exportBundleJson,
   importBundleJson,
-  saveBundleLocal,
-  loadBundleLocal,
-  listLocalProjects,
-  projectKey,
 } from "./lib/bep";
+import {
+  listProjectsApi,
+  getBundleApi,
+  saveBundleApi,
+  createProjectApi,
+  deleteProjectApi,
+  healthApi,
+  projectIdFromName,
+  type ProjectMeta,
+} from "./lib/api";
 import { templates, getTemplate } from "./lib/templates";
 import { sections, sectionForField } from "./components/sections";
 
 type View = "projects" | "editor";
 
-const STORAGE_AUTOSAVE = "bep.autosave";
-
 function App() {
   const [view, setView] = useState<View>("projects");
-  const [activeProjectKey, setActiveProjectKey] = useState<string | null>(null);
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState("projectInformation");
   const [bundle, setBundle] = useState<BepBundle | null>(null);
   const [startMode, setStartMode] = useState<BepMode>("pre-appointment");
   const [templateId, setTemplateId] = useState("penn-state");
   const [newProjectName, setNewProjectName] = useState("");
   const [issues, setIssues] = useState<ReturnType<typeof validateBep>>([]);
-  const [projects, setProjects] = useState(listLocalProjects);
+  const [projects, setProjects] = useState<ProjectMeta[]>([]);
+  const [serverOk, setServerOk] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(false);
   const [authorName, setAuthorName] = useState(localStorage.getItem("bep.author") || "");
   const [toast, setToast] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -41,59 +47,121 @@ function App() {
     setTimeout(() => setToast(null), 2500);
   };
 
+  // Check backend health on load.
+  useEffect(() => {
+    (async () => {
+      try {
+        await healthApi();
+        setServerOk(true);
+      } catch {
+        setServerOk(false);
+      }
+    })();
+  }, []);
+
+  const refreshProjects = async () => {
+    try {
+      const list = await listProjectsApi();
+      setProjects(list);
+    } catch (e: any) {
+      showToast("Could not load projects: " + e.message);
+    }
+  };
+
+  // Persist current bundle to the server.
+  const persist = async (b: BepBundle, opts?: { note?: string; author?: string }) => {
+    const id = activeProjectId ?? projectIdFromName(b.current.projectName);
+    try {
+      await saveBundleApi(id, b, opts);
+      setActiveProjectId(id);
+    } catch (e: any) {
+      showToast("Save failed: " + e.message);
+    }
+  };
+
   const setDoc = (updater: (d: BepDocument) => BepDocument) => {
     setBundle((b) => {
       if (!b) return b;
       const next = updater(b.current);
       const nextBundle: BepBundle = { ...b, current: next };
-      if (activeProjectKey) saveBundleLocal(nextBundle, activeProjectKey);
-      localStorage.setItem(STORAGE_AUTOSAVE, exportBundleJson(nextBundle));
       setIssues(validateBep(next));
+      // Debounced save on the server.
+      void persist(nextBundle);
       return nextBundle;
     });
   };
 
-  const refreshProjects = () => setProjects(listLocalProjects());
-
-  const openEditor = (b: BepBundle, key: string | null) => {
+  const openEditor = (b: BepBundle, id: string | null) => {
     setBundle(b);
     setIssues(validateBep(b.current));
-    setActiveProjectKey(key);
+    setActiveProjectId(id);
     setView("editor");
   };
 
-  const createProject = (mode: BepMode) => {
+  const openProject = async (id: string) => {
+    setLoading(true);
+    try {
+      const b = await getBundleApi(id);
+      openEditor(b, id);
+    } catch (e: any) {
+      showToast("Open failed: " + e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createProject = async (mode: BepMode) => {
     const name = newProjectName.trim() || "Untitled Project";
     const template = getTemplate(templateId) ?? templates[0];
     const doc = template.build(mode, name);
     const b: BepBundle = { current: doc, changelog: [] };
-    saveBundleLocal(b, projectKey(name));
-    refreshProjects();
-    openEditor(b, projectKey(name));
-    showToast(`Created "${name}" from ${template.name}`);
+    const id = projectIdFromName(name);
+    try {
+      await createProjectApi(b);
+      await refreshProjects();
+      openEditor(b, id);
+      showToast(`Created "${name}" from ${template.name}`);
+    } catch (e: any) {
+      showToast("Create failed: " + e.message);
+    }
   };
 
-  const createBlank = (mode: BepMode) => {
+  const createBlank = async (mode: BepMode) => {
     const name = newProjectName.trim() || "Untitled Project";
     const doc = emptyDocument(mode, name);
     const b: BepBundle = { current: doc, changelog: [] };
-    saveBundleLocal(b, projectKey(name));
-    refreshProjects();
-    openEditor(b, projectKey(name));
-    showToast(`Created blank "${name}"`);
+    const id = projectIdFromName(name);
+    try {
+      await createProjectApi(b);
+      await refreshProjects();
+      openEditor(b, id);
+      showToast(`Created blank "${name}"`);
+    } catch (e: any) {
+      showToast("Create failed: " + e.message);
+    }
   };
 
-  const doCommit = () => {
+  const doCommit = async () => {
     if (!bundle) return;
     const note = prompt("Version note:");
     if (note === null) return;
     const author = authorName || "unknown";
     const next = commitVersion(bundle, author, note);
     setBundle(next);
-    if (activeProjectKey) saveBundleLocal(next, activeProjectKey);
-    localStorage.setItem(STORAGE_AUTOSAVE, exportBundleJson(next));
-    refreshProjects();
+    await persist(next, { note, author });
+    await refreshProjects();
     showToast(`Saved revision ${next.current.documentControl.revision}`);
+  };
+
+  const removeProject = async (id: string) => {
+    if (!confirm("Delete this project and its version history?")) return;
+    try {
+      await deleteProjectApi(id);
+      await refreshProjects();
+      showToast("Project deleted");
+    } catch (e: any) {
+      showToast("Delete failed: " + e.message);
+    }
   };
 
   const exportJsonFor = (b: BepBundle) => {
@@ -114,10 +182,12 @@ function App() {
 
   const onImportFile = (file: File) => {
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       try {
         const b = importBundleJson(String(reader.result));
-        openEditor(b, null);
+        await createProjectApi(b);
+        await refreshProjects();
+        openEditor(b, projectIdFromName(b.current.projectName));
         showToast("Imported BEP bundle");
       } catch (e: any) {
         showToast("Import failed: " + e.message);
@@ -125,6 +195,11 @@ function App() {
     };
     reader.readAsText(file);
   };
+
+  // Load projects on first mount.
+  useEffect(() => {
+    void refreshProjects();
+  }, []);
 
   const compliance = useMemo(
     () => (bundle ? complianceStatus(bundle.current) : []),
@@ -134,15 +209,6 @@ function App() {
   const errors = issues.filter((i) => i.severity === "error");
   const warnings = issues.filter((i) => i.severity === "warning");
 
-  const openAutosave = () => {
-    const raw = localStorage.getItem(STORAGE_AUTOSAVE);
-    if (!raw) return;
-    try {
-      const b = importBundleJson(raw);
-      openEditor(b, null);
-    } catch {}
-  };
-
   // ---------------- Render ----------------
   if (view === "projects") {
     return (
@@ -150,6 +216,9 @@ function App() {
         <header className="topbar">
           <h1>BIM Execution Plan Studio</h1>
           <span className="subtitle">Author, version and validate ISO 19650-aligned BEPs</span>
+          {serverOk === false && (
+            <div className="banner-error">⚠ Backend not reachable — persistence is unavailable. Start the API (see README).</div>
+          )}
         </header>
 
         <div className="projects-layout">
@@ -176,14 +245,13 @@ function App() {
             </label>
             <p className="muted">{getTemplate(templateId)?.description}</p>
             <div className="row gap">
-              <button className="btn btn-primary" onClick={() => createProject(startMode)}>Create project</button>
-              <button className="btn" onClick={() => createBlank(startMode)}>Blank</button>
+              <button className="btn btn-primary" onClick={() => createProject(startMode)} disabled={!serverOk}>Create project</button>
+              <button className="btn" onClick={() => createBlank(startMode)} disabled={!serverOk}>Blank</button>
             </div>
 
             <h2>Import</h2>
             <div className="row gap">
-              <button className="btn" onClick={() => fileInput.current?.click()}>Import .bep JSON</button>
-              <button className="btn" onClick={openAutosave}>Resume autosave</button>
+              <button className="btn" onClick={() => fileInput.current?.click()} disabled={!serverOk}>Import .bep JSON</button>
               <input
                 ref={fileInput}
                 type="file"
@@ -196,20 +264,20 @@ function App() {
 
           <section className="panel">
             <h2>Projects</h2>
-            {projects.length === 0 && <p className="muted">No projects yet. Create one to begin.</p>}
+            {projects.length === 0 && !loading && <p className="muted">No projects yet. Create one to begin.</p>}
             {projects.map((p) => (
-              <div key={p.key} className="project-row">
+              <div key={p.id} className="project-row">
                 <div>
                   <strong>{p.name}</strong>
-                  <div className="muted">Updated {new Date(p.updated).toLocaleString()}</div>
+                  <div className="muted">Updated {new Date(p.updatedAt).toLocaleString()}</div>
                 </div>
                 <div className="row gap">
                   <button
                     className="btn btn-ghost"
                     title="Export markdown (convert with pandoc)"
-                    onClick={() => {
-                      const b = loadBundleLocal(p.key);
-                      if (b) exportDocumentFor(b);
+                    onClick={async () => {
+                      const b = await getBundleApi(p.id);
+                      exportDocumentFor(b);
                     }}
                   >
                     Export
@@ -217,19 +285,24 @@ function App() {
                   <button
                     className="btn btn-ghost"
                     title="Download .bep JSON bundle"
-                    onClick={() => {
-                      const b = loadBundleLocal(p.key);
-                      if (b) exportJsonFor(b);
+                    onClick={async () => {
+                      const b = await getBundleApi(p.id);
+                      exportJsonFor(b);
                     }}
                   >
                     .bep
                   </button>
                   <button
+                    className="btn btn-ghost"
+                    title="Delete project"
+                    onClick={() => removeProject(p.id)}
+                  >
+                    ✕
+                  </button>
+                  <button
                     className="btn btn-primary"
-                    onClick={() => {
-                      const b = loadBundleLocal(p.key);
-                      if (b) openEditor(b, p.key);
-                    }}
+                    onClick={() => openProject(p.id)}
+                    disabled={loading}
                   >
                     Open
                   </button>
@@ -252,7 +325,7 @@ function App() {
     <div className="app editor-view">
       <aside className="sidebar">
         <div className="sidebar-head">
-          <button className="btn btn-ghost" onClick={() => { setView("projects"); refreshProjects(); }}>← Projects</button>
+          <button className="btn btn-ghost" onClick={() => { setView("projects"); void refreshProjects(); }}>← Projects</button>
         </div>
         <div className="project-title">
           <strong>{doc.projectName}</strong>
@@ -279,7 +352,7 @@ function App() {
           })}
         </nav>
         <div className="sidebar-footer">
-          <button className="btn btn-ghost" onClick={() => { setView("projects"); refreshProjects(); }}>Save &amp; exit</button>
+          <button className="btn btn-ghost" onClick={() => { setView("projects"); void refreshProjects(); }}>Save &amp; exit</button>
         </div>
       </aside>
 
@@ -292,7 +365,7 @@ function App() {
           <div className="head-actions">
             <button className="btn btn-ghost" onClick={exportDocument} title="Export markdown (convert with pandoc)">Export</button>
             <button className="btn btn-ghost" onClick={exportJson} title="Download full .bep JSON bundle">.bep</button>
-            <button className="btn btn-primary" onClick={doCommit}>Commit revision</button>
+            <button className="btn btn-primary" onClick={() => void doCommit()}>Commit revision</button>
           </div>
         </header>
 

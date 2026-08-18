@@ -19,41 +19,59 @@ A web-based tool for BIM managers and coordinators to **create, manage, and vali
 
 ## Tech stack
 
-- **React + TypeScript + Vite**
+- **React + TypeScript + Vite** (frontend)
+- **Express + PostgreSQL** backend (persistent storage, replaces browser localStorage)
 - Canonical JSON data model (modeled on the dotBEP `.bep` format)
-- No backend required — runs entirely client-side
+- Docker + Docker Compose for containerized deployment
 
 ## Getting started
 
-### Prerequisites
+### Option A — Docker (recommended)
 
-- **Node.js 18+** and npm
-- *(Optional, for DOCX/PDF export)* [Pandoc](https://pandoc.org/) installed and on your `PATH`
-
-### Install & run (development)
+The whole stack (frontend + API + PostgreSQL) runs in containers with persistent storage.
 
 ```bash
 # from the repo root
-npm install
-npm run dev
+docker compose up -d --build
 ```
 
-Then open `http://localhost:5173`.
+Then open `http://localhost:8080`.
+
+- The app + API are served from one container (`bep-studio`, port 8080).
+- PostgreSQL runs in `bep-db` with a named volume (`bep-data`) so **your projects persist across container restarts**.
+- Stop with `docker compose down`; data persists. `docker compose down -v` also removes the data volume.
+
+### Option B — Local development
+
+Requires **Node.js 18+**, npm, and a **PostgreSQL** database.
+
+```bash
+# 1. Create the database (adjust creds to your Postgres)
+createdb bep   # or: psql -c "CREATE DATABASE bep;"
+
+# 2. Install deps
+npm install
+
+# 3. Run the backend (serves the built frontend + API)
+npm run build
+DATABASE_URL=postgres://USER:PASS@localhost:5432/bep npm start
+
+# 4. In a second terminal — frontend dev server with API proxy
+npm run dev      # → http://localhost:5173
+```
 
 ### Production build
 
 ```bash
-npm run build       # outputs static site to dist/
-npm run preview     # serve the production build locally
+npm run build    # outputs static site to dist/ and backend to dist-server/
+npm run preview  # serve the production build locally
 ```
-
-Deploy the `dist/` folder to any static host.
 
 ## Usage
 
-1. **Create a project** — enter a project name, choose **pre-appointment** or **delivery** mode, pick a template, and click **Create project**.
+1. **Create a project** — enter a project name, choose **pre-appointment** or **delivery** mode, pick a template, and click **Create project**. It is saved to the server.
 2. **Fill in the 14 sections** — use the sidebar to navigate. The **inspector** (right panel) shows live compliance status, validation issues, and version history.
-3. **Commit revisions** — click **Commit revision** to snapshot the current state with a note; the change is logged to the version history.
+3. **Commit revisions** — click **Commit revision** to snapshot the current state with a note; the change is logged to the version history and stored in the database.
 4. **Export** — click **Export** to download the plan as Markdown, or **.bep** for the full JSON bundle.
 
 ### Exporting to DOCX / PDF
@@ -74,17 +92,26 @@ pandoc my-plan.md -o my-plan.pdf
 bim-execution-plan/
 ├── research/
 │   └── BEP-RESEARCH.md        # the research knowledge base that informed this tool
+├── server/
+│   ├── index.ts               # Express + PostgreSQL backend (API + serves frontend)
+│   ├── schema.sql             # database schema (projects + versions)
+│   └── tsconfig.json
 ├── src/
 │   ├── types/bep.ts           # canonical BEP data model + empty-document factory
 │   ├── lib/
+│   │   ├── api.ts             # REST client for the backend
 │   │   ├── bep.ts             # versioning, validation, compliance, markdown export
+│   │   ├── options.ts         # predefined value suggestions for form fields
 │   │   └── templates.ts       # Penn State / NATSPEC / blank template presets
 │   ├── components/
-│   │   ├── ui.tsx             # shared form primitives
+│   │   ├── help.ts            # per-field ⓘ help (what + example)
+│   │   ├── ui.tsx             # shared form primitives (incl. Combobox, Field+help)
 │   │   ├── editors.tsx        # the 14 section editors
-│   │   ├── sections.tsx       # section registry + navigation metadata
-│   │   └── App.tsx            # app shell (App.tsx at root)
+│   │   └── sections.tsx       # section registry + navigation metadata
 │   └── App.tsx                # main app: project mgmt, editor, inspector
+├── Dockerfile                 # multi-stage production build
+├── docker-compose.yml         # app + postgres + persistent volume
+└── .dockerignore
 ```
 
 ## Roadmap
