@@ -86,7 +86,8 @@ h4 { font-size: 0.9rem; color: var(--accent); margin-top: 1.2em; }
 .projects-layout { display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start; }
 .panel { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
 .panel h2 { font-size: 1rem; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
-.project-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.project-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.project-row > div:first-child { min-width: 0; }
 .project-row:last-child { border-bottom: none; }
 
 .row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }

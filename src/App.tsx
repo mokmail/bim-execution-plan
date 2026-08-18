@@ -96,21 +96,21 @@ function App() {
     showToast(`Saved revision ${next.current.documentControl.revision}`);
   };
 
-  const exportJson = () => {
-    if (!bundle) return;
+  const exportJsonFor = (b: BepBundle) => {
     downloadFile(
-      `${slug(bundle.current.projectName)}-bep.json`,
-      exportBundleJson(bundle),
+      `${slug(b.current.projectName)}-bep.json`,
+      exportBundleJson(b),
       "application/json",
     );
   };
 
-  const exportDocument = () => {
-    if (!bundle) return;
-    const md = bepToMarkdown(bundle.current);
-    downloadFile(`${slug(bundle.current.projectName)}-bep.md`, md, "text/markdown");
+  const exportDocumentFor = (b: BepBundle) => {
+    downloadFile(`${slug(b.current.projectName)}-bep.md`, bepToMarkdown(b.current), "text/markdown");
     showToast("Markdown exported — convert to DOCX/PDF with pandoc (see docs)");
   };
+
+  const exportJson = () => { if (bundle) exportJsonFor(bundle); };
+  const exportDocument = () => { if (bundle) exportDocumentFor(bundle); };
 
   const onImportFile = (file: File) => {
     const reader = new FileReader();
@@ -203,15 +203,37 @@ function App() {
                   <strong>{p.name}</strong>
                   <div className="muted">Updated {new Date(p.updated).toLocaleString()}</div>
                 </div>
-                <button
-                  className="btn btn-ghost"
-                  onClick={() => {
-                    const b = loadBundleLocal(p.key);
-                    if (b) openEditor(b, p.key);
-                  }}
-                >
-                  Open
-                </button>
+                <div className="row gap">
+                  <button
+                    className="btn btn-ghost"
+                    title="Export markdown (convert with pandoc)"
+                    onClick={() => {
+                      const b = loadBundleLocal(p.key);
+                      if (b) exportDocumentFor(b);
+                    }}
+                  >
+                    Export
+                  </button>
+                  <button
+                    className="btn btn-ghost"
+                    title="Download .bep JSON bundle"
+                    onClick={() => {
+                      const b = loadBundleLocal(p.key);
+                      if (b) exportJsonFor(b);
+                    }}
+                  >
+                    .bep
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => {
+                      const b = loadBundleLocal(p.key);
+                      if (b) openEditor(b, p.key);
+                    }}
+                  >
+                    Open
+                  </button>
+                </div>
               </div>
             ))}
           </section>
