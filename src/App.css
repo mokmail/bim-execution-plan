@@ -77,6 +77,27 @@ h4 { font-size: 0.9rem; color: var(--accent); margin-top: 1.2em; }
 .textarea { resize: vertical; line-height: 1.5; }
 .checkbox { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; }
 
+/* ---------- Help icon & popup ---------- */
+.help-wrap { position: relative; display: inline-flex; margin-left: 5px; vertical-align: middle; }
+.help-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; font-size: 12px; line-height: 1;
+  color: var(--muted); border: 1px solid var(--border-2); border-radius: 50%;
+  cursor: pointer; user-select: none; transition: all 0.15s;
+}
+.help-icon:hover { color: var(--accent); border-color: var(--accent); }
+.help-popup {
+  position: absolute; left: 0; top: 20px; z-index: 200;
+  width: 260px; max-width: 80vw;
+  background: var(--bg-3); border: 1px solid var(--border-2);
+  border-radius: 8px; padding: 12px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 0.8rem; line-height: 1.45;
+}
+.help-popup-what { color: var(--text); }
+.help-popup-ex-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-top: 6px; font-weight: 600; }
+.help-popup-ex { color: var(--muted); font-family: ui-monospace, Consolas, monospace; font-size: 0.75rem; }
+
 /* ---------- Layout ---------- */
 .app { min-height: 100vh; }
 .projects-view { padding: 32px; max-width: 1000px; margin: 0 auto; }

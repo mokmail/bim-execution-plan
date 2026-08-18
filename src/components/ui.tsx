@@ -1,4 +1,5 @@
 import React from "react";
+import { getHelp } from "./help";
 
 // Minimal, clean form primitives shared across section editors.
 
@@ -11,12 +12,40 @@ export function Field({
   children: React.ReactNode;
   hint?: string;
 }) {
+  const help = getHelp(label);
   return (
     <label className="field">
-      <span className="field-label">{label}</span>
+      <span className="field-label">
+        {label}
+        {help && <HelpIcon what={help.what} example={help.example} />}
+      </span>
       {children}
       {hint && <span className="field-hint">{hint}</span>}
     </label>
+  );
+}
+
+// Small ⓘ icon that opens a popup explaining the field.
+function HelpIcon({ what, example }: { what: string; example: string }) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <span
+      className="help-wrap"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setOpen((o) => !o);
+      }}
+    >
+      <span className="help-icon" role="button" tabIndex={0} title="Help">ⓘ</span>
+      {open && (
+        <span className="help-popup" onClick={(e) => e.stopPropagation()}>
+          <span className="help-popup-what">{what}</span>
+          <span className="help-popup-ex-label">Example</span>
+          <span className="help-popup-ex">{example}</span>
+        </span>
+      )}
+    </span>
   );
 }
 
