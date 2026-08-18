@@ -1,3 +1,4 @@
+import { PENN_STATE_BIM_USES } from "../lib/templates";
 import type { BepDocument, SoftwareItem } from "../types/bep";
 import { Field, TextField, TextArea, Select, Checkbox, Combobox, AddButton, RemoveButton } from "./ui";
 import {
@@ -20,6 +21,42 @@ import {
   WORK_STAGE_REFERENCES,
   UNITS,
   COORDINATE_SYSTEMS,
+  BIM_ROLES,
+  PARTIES,
+  COMPETENCE_LEVELS,
+  WORKFLOW_STATES,
+  MEETING_CADENCES,
+  COMMUNICATION_CHANNELS,
+  ESCALATION_PROCEDURES,
+  TRANSITION_AUTHORITIES,
+  CLASH_TOLERANCES,
+  MODEL_BREAKDOWNS,
+  FEDERATION_STRATEGIES,
+  MODEL_OWNERSHIP,
+  QC_VALIDATION_PROCEDURES,
+  QC_CHECKLISTS,
+  QC_RESPONSIBILITIES,
+  AUDIT_FREQUENCIES,
+  QC_REPORTING,
+  NON_CONFORMANCE_PROCESSES,
+  EXCHANGE_NAMES,
+  DELIVERABLE_NAMES,
+  MILESTONE_NAMES,
+  LOD_ELEMENTS,
+  LOD_STAGES,
+  LOD_LEVELS,
+  RESPONSIBLE_ROLES,
+  SECURITY_ACCESS_CONTROL,
+  DATA_PROTECTION,
+  SECURE_STORAGE,
+  SECURITY_RESPONSIBILITIES,
+  TRAINING_NEEDS,
+  COMPETENCE_REQUIREMENTS,
+  TRAINING_PLANS,
+  ONBOARDING,
+  LESSONS_LEARNED,
+  NAMING_CONVENTIONS,
+  PROPERTY_SETS,
 } from "../lib/options";
 
 // Generic helper to update a BepDocument immutably.
@@ -135,7 +172,7 @@ export function BimGoalsEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetD
       {g.uses.map((u) => (
         <div key={u.id} className="card">
           <div className="row">
-            <Field label="BIM Use name"><TextField value={u.name} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, name: v } : x))} /></Field>
+            <Field label="BIM Use name"><Combobox value={u.name} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, name: v } : x))} options={PENN_STATE_BIM_USES} /></Field>
             <Field label="Phase">
               <Select value={u.phase} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, phase: v } : x))}
                 options={[
@@ -143,6 +180,7 @@ export function BimGoalsEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetD
                   { value: "design", label: "Design" },
                   { value: "construction", label: "Construction" },
                   { value: "operations", label: "Operations" },
+                  { value: "handover", label: "Handover" },
                 ]} />
             </Field>
             <Field label="Priority">
@@ -155,8 +193,8 @@ export function BimGoalsEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetD
             </Field>
             <RemoveButton onClick={() => setUses(g.uses.filter((x) => x.id !== u.id))} />
           </div>
-          <Field label="Responsible party"><TextField value={u.responsibleParty} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, responsibleParty: v } : x))} /></Field>
-          <Field label="Competence required"><TextField value={u.competence} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, competence: v } : x))} /></Field>
+          <Field label="Responsible party"><Combobox value={u.responsibleParty} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, responsibleParty: v } : x))} options={PARTIES} /></Field>
+          <Field label="Competence required"><Combobox value={u.competence} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, competence: v } : x))} options={COMPETENCE_LEVELS} /></Field>
           <Field label="Gaps / deficiencies"><TextArea rows={2} value={u.gaps} onChange={(v) => setUses(g.uses.map((x) => x.id === u.id ? { ...x, gaps: v } : x))} /></Field>
         </div>
       ))}
@@ -177,9 +215,9 @@ export function RolesEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc 
       {r.roles.map((role) => (
         <div key={role.id} className="card">
           <div className="row">
-            <Field label="Role"><TextField value={role.role} onChange={(v) => setRoles(r.roles.map((x) => x.id === role.id ? { ...x, role: v } : x))} /></Field>
+            <Field label="Role"><Combobox value={role.role} onChange={(v) => setRoles(r.roles.map((x) => x.id === role.id ? { ...x, role: v } : x))} options={BIM_ROLES} /></Field>
             <Field label="Person"><TextField value={role.person} onChange={(v) => setRoles(r.roles.map((x) => x.id === role.id ? { ...x, person: v } : x))} /></Field>
-            <Field label="Organization"><TextField value={role.organization} onChange={(v) => setRoles(r.roles.map((x) => x.id === role.id ? { ...x, organization: v } : x))} /></Field>
+            <Field label="Organization"><Combobox value={role.organization} onChange={(v) => setRoles(r.roles.map((x) => x.id === role.id ? { ...x, organization: v } : x))} options={PARTIES} /></Field>
             <RemoveButton onClick={() => setRoles(r.roles.filter((x) => x.id !== role.id))} />
           </div>
           <div className="row">
@@ -245,15 +283,15 @@ export function CollaborationEditor({ doc, setDoc }: { doc: BepDocument; setDoc:
       <Field label="CDE platform">
         <Combobox value={c.cdePlatform} onChange={(v) => up({ cdePlatform: v })} options={CDE_PLATFORMS} />
       </Field>
-      <Field label="Naming convention"><TextField value={c.namingConvention} onChange={(v) => up({ namingConvention: v })} /></Field>
+      <Field label="Naming convention"><Combobox value={c.namingConvention} onChange={(v) => up({ namingConvention: v })} options={NAMING_CONVENTIONS} /></Field>
       <div className="full">
-        <Field label="Workflow states"><TextField value={c.workflowStates} onChange={(v) => up({ workflowStates: v })} /></Field>
+        <Field label="Workflow states"><Combobox value={c.workflowStates} onChange={(v) => up({ workflowStates: v })} options={WORKFLOW_STATES} /></Field>
       </div>
       <div className="full"><Field label="File/folder structure"><TextArea value={c.fileStructure} onChange={(v) => up({ fileStructure: v })} /></Field></div>
-      <Field label="Transition authority"><TextField value={c.transitionAuthority} onChange={(v) => up({ transitionAuthority: v })} /></Field>
-      <Field label="Meeting cadence"><TextField value={c.meetingCadence} onChange={(v) => up({ meetingCadence: v })} /></Field>
-      <Field label="Communication channels"><TextField value={c.communicationChannels} onChange={(v) => up({ communicationChannels: v })} /></Field>
-      <div className="full"><Field label="Escalation procedure"><TextArea value={c.escalationProcedure} onChange={(v) => up({ escalationProcedure: v })} /></Field></div>
+      <Field label="Transition authority"><Combobox value={c.transitionAuthority} onChange={(v) => up({ transitionAuthority: v })} options={TRANSITION_AUTHORITIES} /></Field>
+      <Field label="Meeting cadence"><Combobox value={c.meetingCadence} onChange={(v) => up({ meetingCadence: v })} options={MEETING_CADENCES} /></Field>
+      <Field label="Communication channels"><Combobox value={c.communicationChannels} onChange={(v) => up({ communicationChannels: v })} options={COMMUNICATION_CHANNELS} /></Field>
+      <div className="full"><Field label="Escalation procedure"><Combobox value={c.escalationProcedure} onChange={(v) => up({ escalationProcedure: v })} options={ESCALATION_PROCEDURES} /></Field></div>
     </div>
   );
 }
@@ -278,7 +316,7 @@ export function DataExchangeEditor({ doc, setDoc }: { doc: BepDocument; setDoc: 
       {d.exchanges.map((e) => (
         <div key={e.id} className="card">
           <div className="row">
-            <Field label="Name"><TextField value={e.name} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, name: v } : x))} /></Field>
+            <Field label="Name"><Combobox value={e.name} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, name: v } : x))} options={EXCHANGE_NAMES} /></Field>
             <Field label="Format">
               <Combobox value={e.format} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, format: v } : x))} options={EXCHANGE_FORMATS} />
             </Field>
@@ -286,11 +324,11 @@ export function DataExchangeEditor({ doc, setDoc }: { doc: BepDocument; setDoc: 
             <RemoveButton onClick={() => setExchanges(d.exchanges.filter((x) => x.id !== e.id))} />
           </div>
           <div className="row">
-            <Field label="Recipient"><TextField value={e.recipient} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, recipient: v } : x))} /></Field>
+            <Field label="Recipient"><Combobox value={e.recipient} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, recipient: v } : x))} options={PARTIES} /></Field>
             <Field label="Level of detail">
               <Combobox value={e.levelOfDetail} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, levelOfDetail: v } : x))} options={EXCHANGE_LOD} />
             </Field>
-            <Field label="Responsible author"><TextField value={e.responsibleAuthor} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, responsibleAuthor: v } : x))} /></Field>
+            <Field label="Responsible author"><Combobox value={e.responsibleAuthor} onChange={(v) => setExchanges(d.exchanges.map((x) => x.id === e.id ? { ...x, responsibleAuthor: v } : x))} options={RESPONSIBLE_ROLES} /></Field>
           </div>
         </div>
       ))}
@@ -358,8 +396,8 @@ export function StandardsEditor({ doc, setDoc }: { doc: BepDocument; setDoc: Set
       <Field label="Coordinates / geolocation">
         <Combobox value={st.coordinates} onChange={(v) => up({ coordinates: v })} options={COORDINATE_SYSTEMS} />
       </Field>
-      <div className="full"><Field label="Naming conventions"><TextArea value={st.namingConventions} onChange={(v) => up({ namingConventions: v })} /></Field></div>
-      <div className="full"><Field label="Property sets / data templates"><TextArea value={st.propertySets} onChange={(v) => up({ propertySets: v })} /></Field></div>
+      <div className="full"><Field label="Naming conventions"><Combobox value={st.namingConventions} onChange={(v) => up({ namingConventions: v })} options={NAMING_CONVENTIONS} /></Field></div>
+      <div className="full"><Field label="Property sets / data templates"><Combobox value={st.propertySets} onChange={(v) => up({ propertySets: v })} options={PROPERTY_SETS} /></Field></div>
     </div>
   );
 }
@@ -381,10 +419,10 @@ export function LodEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetDoc })
       {l.matrix.length === 0 && <p className="muted">No matrix entries yet.</p>}
       {l.matrix.map((row) => (
         <div key={row.id} className="row">
-          <TextField value={row.element} placeholder="Element / system" onChange={(v) => setMatrix(l.matrix.map((x) => x.id === row.id ? { ...x, element: v } : x))} />
-          <TextField value={row.stage} placeholder="Stage" onChange={(v) => setMatrix(l.matrix.map((x) => x.id === row.id ? { ...x, stage: v } : x))} />
-          <TextField value={row.level} placeholder="LOD / LOIN" onChange={(v) => setMatrix(l.matrix.map((x) => x.id === row.id ? { ...x, level: v } : x))} />
-          <TextField value={row.responsibleParty} placeholder="Responsible" onChange={(v) => setMatrix(l.matrix.map((x) => x.id === row.id ? { ...x, responsibleParty: v } : x))} />
+          <Combobox value={row.element} placeholder="Element / system" onChange={(v) => setMatrix(l.matrix.map((x) => x.id === row.id ? { ...x, element: v } : x))} options={LOD_ELEMENTS} />
+          <Combobox value={row.stage} placeholder="Stage" onChange={(v) => setMatrix(l.matrix.map((x) => x.id === row.id ? { ...x, stage: v } : x))} options={LOD_STAGES} />
+          <Combobox value={row.level} placeholder="LOD / LOIN" onChange={(v) => setMatrix(l.matrix.map((x) => x.id === row.id ? { ...x, level: v } : x))} options={LOD_LEVELS} />
+          <Combobox value={row.responsibleParty} placeholder="Responsible" onChange={(v) => setMatrix(l.matrix.map((x) => x.id === row.id ? { ...x, responsibleParty: v } : x))} options={RESPONSIBLE_ROLES} />
           <RemoveButton onClick={() => setMatrix(l.matrix.filter((x) => x.id !== row.id))} />
         </div>
       ))}
@@ -399,12 +437,12 @@ export function ModelManagementEditor({ doc, setDoc }: { doc: BepDocument; setDo
   const up = (patch: Partial<typeof m>) => setDoc((x) => ({ ...x, modelManagement: { ...x.modelManagement, ...patch } }));
   return (
     <div className="grid">
-      <Field label="Model breakdown structure"><TextField value={m.breakdown} onChange={(v) => up({ breakdown: v })} /></Field>
-      <Field label="Clash tolerance"><TextField value={m.clashTolerance} onChange={(v) => up({ clashTolerance: v })} /></Field>
-      <div className="full"><Field label="Federation strategy"><TextArea value={m.federationStrategy} onChange={(v) => up({ federationStrategy: v })} /></Field></div>
-      <Field label="Coordination cadence"><TextField value={m.coordinationCadence} onChange={(v) => up({ coordinationCadence: v })} /></Field>
-      <Field label="Model ownership / version control"><TextField value={m.ownership} onChange={(v) => up({ ownership: v })} /></Field>
-      <div className="full"><Field label="BCF issue workflow"><TextArea value={m.bcfWorkflow} onChange={(v) => up({ bcfWorkflow: v })} /></Field></div>
+      <Field label="Model breakdown structure"><Combobox value={m.breakdown} onChange={(v) => up({ breakdown: v })} options={MODEL_BREAKDOWNS} /></Field>
+      <Field label="Clash tolerance"><Combobox value={m.clashTolerance} onChange={(v) => up({ clashTolerance: v })} options={CLASH_TOLERANCES} /></Field>
+      <div className="full"><Field label="Federation strategy"><Combobox value={m.federationStrategy} onChange={(v) => up({ federationStrategy: v })} options={FEDERATION_STRATEGIES} /></Field></div>
+      <Field label="Coordination cadence"><Combobox value={m.coordinationCadence} onChange={(v) => up({ coordinationCadence: v })} options={MEETING_CADENCES} /></Field>
+      <Field label="Model ownership / version control"><Combobox value={m.ownership} onChange={(v) => up({ ownership: v })} options={MODEL_OWNERSHIP} /></Field>
+      <div className="full"><Field label="BCF issue workflow"><Combobox value={m.bcfWorkflow} onChange={(v) => up({ bcfWorkflow: v })} options={["BCF topics: Open → In Progress → Closed", "BCF issues logged and tracked per coordination cycle", "BCF + clash detection workflow"]} /></Field></div>
     </div>
   );
 }
@@ -415,12 +453,12 @@ export function QualityControlEditor({ doc, setDoc }: { doc: BepDocument; setDoc
   const up = (patch: Partial<typeof q>) => setDoc((x) => ({ ...x, qualityControl: { ...x.qualityControl, ...patch } }));
   return (
     <div className="grid">
-      <div className="full"><Field label="Model validation / checking procedure"><TextArea value={q.validationProcedure} onChange={(v) => up({ validationProcedure: v })} /></Field></div>
-      <div className="full"><Field label="Quality control checklists"><TextArea value={q.checklists} onChange={(v) => up({ checklists: v })} /></Field></div>
-      <Field label="QC responsibility"><TextField value={q.qcResponsibility} onChange={(v) => up({ qcResponsibility: v })} /></Field>
-      <Field label="Audit / review frequency"><TextField value={q.auditFrequency} onChange={(v) => up({ auditFrequency: v })} /></Field>
-      <div className="full"><Field label="Non-conformance / issue resolution"><TextArea value={q.nonConformance} onChange={(v) => up({ nonConformance: v })} /></Field></div>
-      <div className="full"><Field label="Reporting"><TextArea value={q.reporting} onChange={(v) => up({ reporting: v })} /></Field></div>
+      <div className="full"><Field label="Model validation / checking procedure"><Combobox value={q.validationProcedure} onChange={(v) => up({ validationProcedure: v })} options={QC_VALIDATION_PROCEDURES} /></Field></div>
+      <div className="full"><Field label="Quality control checklists"><Combobox value={q.checklists} onChange={(v) => up({ checklists: v })} options={QC_CHECKLISTS} /></Field></div>
+      <Field label="QC responsibility"><Combobox value={q.qcResponsibility} onChange={(v) => up({ qcResponsibility: v })} options={QC_RESPONSIBILITIES} /></Field>
+      <Field label="Audit / review frequency"><Combobox value={q.auditFrequency} onChange={(v) => up({ auditFrequency: v })} options={AUDIT_FREQUENCIES} /></Field>
+      <div className="full"><Field label="Non-conformance / issue resolution"><Combobox value={q.nonConformance} onChange={(v) => up({ nonConformance: v })} options={NON_CONFORMANCE_PROCESSES} /></Field></div>
+      <div className="full"><Field label="Reporting"><Combobox value={q.reporting} onChange={(v) => up({ reporting: v })} options={QC_REPORTING} /></Field></div>
     </div>
   );
 }
@@ -440,16 +478,16 @@ export function DeliveryEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetD
       {d.milestones.map((m) => (
         <div key={m.id} className="card">
           <div className="row">
-            <Field label="Milestone"><TextField value={m.name} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, name: v } : x))} /></Field>
+            <Field label="Milestone"><Combobox value={m.name} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, name: v } : x))} options={MILESTONE_NAMES} /></Field>
             <Field label="Date"><TextField value={m.date} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, date: v } : x))} /></Field>
             <RemoveButton onClick={() => setMilestones(d.milestones.filter((x) => x.id !== m.id))} />
           </div>
           <div className="row">
-            <Field label="Deliverable"><TextField value={m.deliverable} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, deliverable: v } : x))} /></Field>
-            <Field label="Recipient"><TextField value={m.recipient} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, recipient: v } : x))} /></Field>
-            <Field label="Format"><TextField value={m.format} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, format: v } : x))} /></Field>
+            <Field label="Deliverable"><Combobox value={m.deliverable} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, deliverable: v } : x))} options={DELIVERABLE_NAMES} /></Field>
+            <Field label="Recipient"><Combobox value={m.recipient} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, recipient: v } : x))} options={PARTIES} /></Field>
+            <Field label="Format"><Combobox value={m.format} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, format: v } : x))} options={EXCHANGE_FORMATS} /></Field>
           </div>
-          <Field label="Responsible author"><TextField value={m.responsibleAuthor} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, responsibleAuthor: v } : x))} /></Field>
+          <Field label="Responsible author"><Combobox value={m.responsibleAuthor} onChange={(v) => setMilestones(d.milestones.map((x) => x.id === m.id ? { ...x, responsibleAuthor: v } : x))} options={RESPONSIBLE_ROLES} /></Field>
         </div>
       ))}
       <AddButton label="Add milestone" onClick={() => setMilestones([...d.milestones, { id: uid("ms"), name: "", date: "", deliverable: "", recipient: "", format: "", responsibleAuthor: "", notes: "" }])} />
@@ -469,10 +507,10 @@ export function SecurityEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetD
       <Field label="Security classification">
         <Combobox value={s.classification} onChange={(v) => up({ classification: v })} options={SECURITY_CLASSIFICATIONS} />
       </Field>
-      <div className="full"><Field label="Access control & permissions"><TextArea value={s.accessControl} onChange={(v) => up({ accessControl: v })} /></Field></div>
-      <div className="full"><Field label="Data protection / confidentiality"><TextArea value={s.dataProtection} onChange={(v) => up({ dataProtection: v })} /></Field></div>
-      <div className="full"><Field label="Secure storage & transmission"><TextArea value={s.secureStorage} onChange={(v) => up({ secureStorage: v })} /></Field></div>
-      <div className="full"><Field label="Security responsibilities & incident response"><TextArea value={s.responsibilities} onChange={(v) => up({ responsibilities: v })} /></Field></div>
+      <div className="full"><Field label="Access control & permissions"><Combobox value={s.accessControl} onChange={(v) => up({ accessControl: v })} options={SECURITY_ACCESS_CONTROL} /></Field></div>
+      <div className="full"><Field label="Data protection / confidentiality"><Combobox value={s.dataProtection} onChange={(v) => up({ dataProtection: v })} options={DATA_PROTECTION} /></Field></div>
+      <div className="full"><Field label="Secure storage & transmission"><Combobox value={s.secureStorage} onChange={(v) => up({ secureStorage: v })} options={SECURE_STORAGE} /></Field></div>
+      <div className="full"><Field label="Security responsibilities & incident response"><Combobox value={s.responsibilities} onChange={(v) => up({ responsibilities: v })} options={SECURITY_RESPONSIBILITIES} /></Field></div>
     </div>
   );
 }
@@ -483,11 +521,11 @@ export function TrainingEditor({ doc, setDoc }: { doc: BepDocument; setDoc: SetD
   const up = (patch: Partial<typeof t>) => setDoc((x) => ({ ...x, training: { ...x.training, ...patch } }));
   return (
     <div className="grid">
-      <Field label="Training needs assessment"><TextField value={t.needsAssessment} onChange={(v) => up({ needsAssessment: v })} /></Field>
-      <Field label="Competence requirements"><TextField value={t.competencies} onChange={(v) => up({ competencies: v })} /></Field>
-      <div className="full"><Field label="Training plan & schedule"><TextArea value={t.plan} onChange={(v) => up({ plan: v })} /></Field></div>
-      <div className="full"><Field label="Onboarding for new members"><TextArea value={t.onboarding} onChange={(v) => up({ onboarding: v })} /></Field></div>
-      <div className="full"><Field label="Knowledge transfer / lessons learned"><TextArea value={t.lessonsLearned} onChange={(v) => up({ lessonsLearned: v })} /></Field></div>
+      <Field label="Training needs assessment"><Combobox value={t.needsAssessment} onChange={(v) => up({ needsAssessment: v })} options={TRAINING_NEEDS} /></Field>
+      <Field label="Competence requirements"><Combobox value={t.competencies} onChange={(v) => up({ competencies: v })} options={COMPETENCE_REQUIREMENTS} /></Field>
+      <div className="full"><Field label="Training plan & schedule"><Combobox value={t.plan} onChange={(v) => up({ plan: v })} options={TRAINING_PLANS} /></Field></div>
+      <div className="full"><Field label="Onboarding for new members"><Combobox value={t.onboarding} onChange={(v) => up({ onboarding: v })} options={ONBOARDING} /></Field></div>
+      <div className="full"><Field label="Knowledge transfer / lessons learned"><Combobox value={t.lessonsLearned} onChange={(v) => up({ lessonsLearned: v })} options={LESSONS_LEARNED} /></Field></div>
     </div>
   );
 }
