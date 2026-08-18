@@ -225,6 +225,34 @@ export const COORDINATE_SYSTEMS = [
 
 // ---- Additional predefined values for fields across all 14 sections ----
 
+export const PENN_STATE_BIM_USES = [
+  "Existing Conditions Modeling",
+  "Record Modeling",
+  "Site Analysis",
+  "Design Authoring",
+  "Design Reviews",
+  "Structural Analysis",
+  "Lighting Analysis",
+  "Energy Analysis",
+  "Mechanical Analysis",
+  "Other Engineering Analysis",
+  "Sustainability (LEED) Evaluation",
+  "Code Validation",
+  "3D Coordination",
+  "Programming",
+  "Space Program Validation",
+  "Phase Planning (4D Modeling)",
+  "Cost Estimation (5D Modeling)",
+  "Site Utilization Planning",
+  "Construction System Design",
+  "Digital Fabrication",
+  "3D Control and Planning",
+  "Building Maintenance Scheduling",
+  "Building System Analysis",
+  "Asset Management",
+  "Space Management and Tracking",
+];
+
 export const BIM_ROLES = [
   "BIM Manager",
   "BIM Coordinator",

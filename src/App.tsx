@@ -23,6 +23,7 @@ import {
 } from "./lib/api";
 import { templates, getTemplate } from "./lib/templates";
 import { sections, sectionForField } from "./components/sections";
+import { ProjectWizard, type WizardData } from "./components/ProjectWizard";
 
 type View = "projects" | "editor";
 
@@ -40,6 +41,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [authorName, setAuthorName] = useState(localStorage.getItem("bep.author") || "");
   const [toast, setToast] = useState<string | null>(null);
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [wizardData, setWizardData] = useState<WizardData>(defaultWizardData);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const showToast = (msg: string) => {
@@ -121,6 +124,20 @@ function App() {
       await refreshProjects();
       openEditor(b, id);
       showToast(`Created "${name}" from ${template.name}`);
+    } catch (e: any) {
+      showToast("Create failed: " + e.message);
+    }
+  };
+
+  const submitWizard = async (doc: BepDocument) => {
+    const b: BepBundle = { current: doc, changelog: [] };
+    const id = projectIdFromName(doc.projectName);
+    try {
+      await createProjectApi(b);
+      await refreshProjects();
+      setWizardOpen(false);
+      openEditor(b, id);
+      showToast(`Project "${doc.projectName}" created from wizard`);
     } catch (e: any) {
       showToast("Create failed: " + e.message);
     }
@@ -224,6 +241,10 @@ function App() {
         <div className="projects-layout">
           <section className="panel">
             <h2>New project</h2>
+            <div className="row gap" style={{ marginBottom: 14 }}>
+              <button className="btn btn-primary" onClick={() => { setWizardData(defaultWizardData()); setWizardOpen(true); }} disabled={!serverOk}>✦ Guided setup (wizard)</button>
+            </div>
+            <p className="muted" style={{ marginBottom: 14 }}>Or create quickly from a template:</p>
             <label className="field">
               <span className="field-label">Project name</span>
               <input className="input" value={newProjectName} placeholder="e.g. North Campus Extension" onChange={(e) => setNewProjectName(e.target.value)} />
@@ -317,6 +338,17 @@ function App() {
             ))}
           </section>
         </div>
+
+        {wizardOpen && (
+          <div className="wizard-overlay">
+            <ProjectWizard
+              initial={wizardData}
+              onChange={setWizardData}
+              onSubmit={submitWizard}
+              onCancel={() => setWizardOpen(false)}
+            />
+          </div>
+        )}
       </div>
     );
   }
@@ -436,6 +468,29 @@ function App() {
 
 function slug(s: string): string {
   return s.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "bep";
+}
+
+function defaultWizardData(): WizardData {
+  return {
+    name: "",
+    mode: "pre-appointment",
+    sector: "",
+    deliveryMethod: "",
+    owner: "",
+    goals: [],
+    bimUses: [
+      { name: "3D Coordination", phase: "Design", priority: "high", responsibleParty: "" },
+      { name: "Design Authoring", phase: "Design", priority: "high", responsibleParty: "" },
+    ],
+    roles: [
+      { role: "BIM Manager", person: "", organization: "" },
+      { role: "BIM Coordinator", person: "", organization: "" },
+    ],
+    milestones: [
+      { name: "Design Coordination Issue", deliverable: "Federated coordination model", format: "IFC 4" },
+      { name: "Practical Completion", deliverable: "As-built model + COBie data", format: "IFC + COBie" },
+    ],
+  };
 }
 
 export default App;

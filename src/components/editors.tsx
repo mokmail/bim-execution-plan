@@ -1,4 +1,4 @@
-import { PENN_STATE_BIM_USES } from "../lib/templates";
+import { PENN_STATE_BIM_USES } from "../lib/options";
 import type { BepDocument, SoftwareItem } from "../types/bep";
 import { Field, TextField, TextArea, Select, Checkbox, Combobox, AddButton, RemoveButton } from "./ui";
 import {

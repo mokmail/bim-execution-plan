@@ -1,36 +1,9 @@
 import type { BepDocument, BepMode } from "../types/bep";
 import { emptyDocument } from "../types/bep";
+import { PENN_STATE_BIM_USES } from "./options";
 
 // Template generators that pre-fill a BEP structure.
 // Penn State 25 BIM Uses + NATSPEC / ISO 19650 style section scaffolding.
-
-export const PENN_STATE_BIM_USES = [
-  "Existing Conditions Modeling",
-  "Record Modeling",
-  "Site Analysis",
-  "Design Authoring",
-  "Design Reviews",
-  "Structural Analysis",
-  "Lighting Analysis",
-  "Energy Analysis",
-  "Mechanical Analysis",
-  "Other Engineering Analysis",
-  "Sustainability (LEED) Evaluation",
-  "Code Validation",
-  "3D Coordination",
-  "Programming",
-  "Space Program Validation",
-  "Phase Planning (4D Modeling)",
-  "Cost Estimation (5D Modeling)",
-  "Site Utilization Planning",
-  "Construction System Design",
-  "Digital Fabrication",
-  "3D Control and Planning",
-  "Building Maintenance Scheduling",
-  "Building System Analysis",
-  "Asset Management",
-  "Space Management and Tracking",
-];
 
 export interface TemplatePreset {
   id: string;
