@@ -24,8 +24,9 @@ import {
 import { getTemplate } from "./lib/templates";
 import { ProjectWizard } from "./components/ProjectWizard";
 import { Dashboard } from "./components/Dashboard";
+import { Wiki } from "./components/Wiki";
 
-type View = "projects" | "wizard";
+type View = "projects" | "wizard" | "wiki";
 
 function App() {
   const [view, setView] = useState<View>("projects");
@@ -178,6 +179,14 @@ function App() {
   };
 
   // ---------------- Render ----------------
+  if (view === "wiki") {
+    return (
+      <div className="app">
+        <Wiki onBack={() => setView("projects")} />
+      </div>
+    );
+  }
+
   if (view === "projects") {
     return (
       <div className="app dash-app">
@@ -188,6 +197,7 @@ function App() {
           serverOk={serverOk}
           onNewProject={() => openNewWizard("pre-appointment")}
           onNewDelivery={() => openNewWizard("delivery")}
+          onOpenWiki={() => setView("wiki")}
           onOpenProject={openProject}
           onDeleteProject={removeProject}
           onExportMd={async (id) => {

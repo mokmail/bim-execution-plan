@@ -13,6 +13,7 @@ interface Props {
   serverOk: boolean | null;
   onNewProject: () => void;
   onNewDelivery: () => void;
+  onOpenWiki: () => void;
   onOpenProject: (id: string) => void;
   onDeleteProject: (id: string) => void;
   onExportMd: (id: string) => void;
@@ -26,6 +27,7 @@ export function Dashboard({
   serverOk,
   onNewProject,
   onNewDelivery,
+  onOpenWiki,
   onOpenProject,
   onDeleteProject,
   onExportMd,
@@ -57,6 +59,9 @@ export function Dashboard({
             </button>
             <button className="btn btn-lg" onClick={onNewDelivery} disabled={!serverOk}>
               Delivery mode
+            </button>
+            <button className="btn btn-lg" onClick={onOpenWiki}>
+              Wiki
             </button>
           </div>
           {serverOk === false && (
