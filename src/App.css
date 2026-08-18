@@ -135,6 +135,42 @@ h4 { font-size: 0.9rem; color: var(--accent); margin-top: 1.2em; }
   padding: 14px 20px; border-top: 1px solid var(--border);
 }
 
+/* Full-screen wizard (single interface) */
+.wizard-app { height: 100vh; display: flex; align-items: stretch; justify-content: center; }
+.wizard-app .wizard-overlay { position: static; padding: 0; background: var(--bg); align-items: stretch; }
+.wizard-full {
+  width: 100%; max-width: none; max-height: none; height: 100%;
+  border-radius: 0; border: none;
+}
+.wizard-full .wizard-head { padding: 14px 22px; }
+.wizard-title { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; }
+.wizard-body-full {
+  flex: 1; display: flex; overflow: hidden; min-height: 0;
+}
+.wizard-index {
+  width: 230px; flex-shrink: 0; overflow-y: auto;
+  background: var(--bg-2); border-right: 1px solid var(--border);
+  padding: 12px;
+}
+.wizard-index .wizard-index-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 0 8px 8px; }
+.wizard-index-item {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  background: transparent; border: none; color: var(--text);
+  padding: 8px 10px; border-radius: 8px; cursor: pointer; text-align: left; font-size: 0.83rem;
+}
+.wizard-index-item:hover { background: var(--bg-3); }
+.wizard-index-item.active { background: var(--bg-3); color: var(--accent); }
+.wizard-index-num { color: var(--muted); font-size: 0.72rem; min-width: 16px; }
+.wizard-section {
+  flex: 1; overflow-y: auto; padding: 24px 32px; min-width: 0;
+}
+.wizard-section-title { margin-top: 0; font-size: 1.2rem; margin-bottom: 18px; }
+.wizard-inspector {
+  width: 300px; flex-shrink: 0; overflow-y: auto;
+  border-left: 1px solid var(--border); background: var(--bg-2); padding: 16px;
+}
+.author-input { max-width: 150px; }
+
 /* ---------- Layout ---------- */
 .app { min-height: 100vh; }
 .projects-view { padding: 32px; max-width: 1000px; margin: 0 auto; }

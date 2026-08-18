@@ -1,208 +1,122 @@
 import { useState } from "react";
-import type { BepDocument, BepMode } from "../types/bep";
-import { emptyDocument } from "../types/bep";
-import {
-  DELIVERY_METHODS,
-  PROJECT_SECTORS,
-  BIM_ROLES,
-  PARTIES,
-  MILESTONE_NAMES,
-} from "../lib/options";
-import { PENN_STATE_BIM_USES } from "../lib/options";
-import { Combobox, Field } from "./ui";
-
-export interface WizardData {
-  name: string;
-  mode: BepMode;
-  sector: string;
-  deliveryMethod: string;
-  owner: string;
-  goals: string[];
-  bimUses: { name: string; phase: string; priority: string; responsibleParty: string }[];
-  roles: { role: string; person: string; organization: string }[];
-  milestones: { name: string; deliverable: string; format: string }[];
-}
-
-const PHASES = ["Planning", "Design", "Construction", "Operations", "Handover"];
-const PRIORITIES = ["high", "medium", "low"];
+import type { BepDocument } from "../types/bep";
+import { sections, sectionForField } from "./sections";
+import { validateBep, complianceStatus } from "../lib/bep";
 
 interface Props {
-  initial: WizardData;
-  onChange: (d: WizardData) => void;
-  onSubmit: (doc: BepDocument) => void;
+  doc: BepDocument;
+  isNew: boolean;
+  authorName?: string;
+  onAuthorChange?: (v: string) => void;
+  onDocChange: (d: BepDocument) => void;
+  onSubmit: (d: BepDocument, commitRevision: boolean) => void;
   onCancel: () => void;
 }
 
-const STEPS = ["Basics", "BIM Goals & Uses", "Roles", "Delivery"];
+// Single-interface wizard covering all 14 BEP sections.
+// Reuses the section editors from sections.tsx; works for both
+// create (blank/template doc) and edit (pre-filled existing doc).
+export function ProjectWizard({ doc, isNew, authorName, onAuthorChange, onDocChange, onSubmit, onCancel }: Props) {
+  const [stepIdx, setStepIdx] = useState(0);
+  const [commitOnSave, setCommitOnSave] = useState(!isNew);
 
-export function ProjectWizard({ initial, onChange, onSubmit, onCancel }: Props) {
-  const [step, setStep] = useState(0);
-  const [data, setData] = useState<WizardData>(initial);
+  const active = sections[stepIdx];
+  const Editor = active.Component;
+  const issues = validateBep(doc);
+  const compliance = complianceStatus(doc);
+  const complianceCount = compliance.filter((c) => c.met).length;
 
-  const update = (patch: Partial<WizardData>) => {
-    const next = { ...data, ...patch };
-    setData(next);
-    onChange(next);
-  };
+  const setDoc = (updater: (d: BepDocument) => BepDocument) => onDocChange(updater(doc));
 
-  const buildDoc = (): BepDocument => {
-    const doc = emptyDocument(data.mode, data.name || "Untitled Project");
-    const p = doc.projectInformation;
-    p.projectName = data.name;
-    p.sector = data.sector;
-    p.deliveryMethod = data.deliveryMethod;
-    p.owner = data.owner;
-    doc.bimGoals.goals = data.goals.filter((g) => g.trim());
-    doc.bimGoals.uses = data.bimUses
-      .filter((u) => u.name.trim())
-      .map((u, i) => ({
-        id: `use-${i}`,
-        name: u.name,
-        description: "",
-        phase: u.phase.toLowerCase(),
-        responsibleParty: u.responsibleParty,
-        priority: u.priority as "high" | "medium" | "low",
-        competence: "",
-        gaps: "",
-      }));
-    doc.responsibilities.roles = data.roles
-      .filter((r) => r.role.trim())
-      .map((r, i) => ({
-        id: `role-${i}`,
-        role: r.role,
-        person: r.person,
-        organization: r.organization,
-        email: "",
-        scope: "",
-        dedicated: true,
-      }));
-    doc.delivery.milestones = data.milestones
-      .filter((m) => m.name.trim())
-      .map((m, i) => ({
-        id: `ms-${i}`,
-        name: m.name,
-        date: "",
-        deliverable: m.deliverable,
-        recipient: data.owner || "Appointing Party",
-        format: m.format,
-        responsibleAuthor: "",
-        notes: "",
-      }));
-    return doc;
-  };
-
-  const canNext = () => {
-    if (step === 0) return data.name.trim().length > 0;
-    return true;
+  const goTo = (i: number) => {
+    if (i >= 0 && i < sections.length) setStepIdx(i);
   };
 
   return (
-    <div className="wizard">
+    <div className="wizard wizard-full">
       <div className="wizard-head">
-        <div className="wizard-steps">
-          {STEPS.map((s, i) => (
-            <div key={s} className={`wizard-step ${i === step ? "active" : i < step ? "done" : ""}`}>
-              <span className="wizard-step-num">{i + 1}</span>
-              <span className="wizard-step-label">{s}</span>
-            </div>
-          ))}
+        <div className="wizard-title">
+          <strong>{isNew ? "New BIM Execution Plan" : doc.projectName}</strong>
+          <span className="pill pill-mode">{doc.mode}</span>
+          <span className="pill">{complianceCount}/{compliance.length} compliance</span>
         </div>
         <button className="btn btn-ghost" onClick={onCancel}>Cancel</button>
       </div>
 
-      <div className="wizard-body">
-        {step === 0 && (
-          <div className="grid">
-            <Field label="Project name">
-              <Combobox value={data.name} onChange={(v) => update({ name: v })} options={["North Campus Extension", "Riverside Hospital", "Central Plaza Tower"]} />
-            </Field>
-            <Field label="BEP mode">
-              <select className="input" value={data.mode} onChange={(e) => update({ mode: e.target.value as BepMode })}>
-                <option value="pre-appointment">Pre-appointment (tender)</option>
-                <option value="delivery">Delivery (post-contract)</option>
-              </select>
-            </Field>
-            <Field label="Sector">
-              <Combobox value={data.sector} onChange={(v) => update({ sector: v })} options={PROJECT_SECTORS} />
-            </Field>
-            <Field label="Delivery method">
-              <Combobox value={data.deliveryMethod} onChange={(v) => update({ deliveryMethod: v })} options={DELIVERY_METHODS} />
-            </Field>
-            <Field label="Owner / client">
-              <Combobox value={data.owner} onChange={(v) => update({ owner: v })} options={PARTIES} />
-            </Field>
-          </div>
-        )}
+      <div className="wizard-body-full">
+        <aside className="wizard-index">
+          <div className="wizard-index-label">Sections</div>
+          {sections.map((s, i) => {
+            const sectionIssues = issues.filter((is) => sectionForField(is.path) === s.id);
+            const hasErr = sectionIssues.some((x) => x.severity === "error");
+            const hasWarn = sectionIssues.some((x) => x.severity === "warning");
+            return (
+              <button
+                key={s.id}
+                className={`wizard-index-item ${i === stepIdx ? "active" : ""}`}
+                onClick={() => goTo(i)}
+              >
+                <span className="wizard-index-num">{s.num}</span>
+                <span className="wizard-index-label">{s.short}</span>
+                {hasErr && <span className="dot dot-error" />}
+                {!hasErr && hasWarn && <span className="dot dot-warn" />}
+              </button>
+            );
+          })}
+        </aside>
 
-        {step === 1 && (
-          <div>
-            <h4>BIM goals</h4>
-            {data.goals.map((g, i) => (
-              <div key={i} className="row" style={{ marginBottom: 6 }}>
-                <input className="input" value={g} onChange={(e) => update({ goals: data.goals.map((x, j) => (j === i ? e.target.value : x)) })} />
-                <button className="btn btn-icon" onClick={() => update({ goals: data.goals.filter((_, j) => j !== i) })}>✕</button>
-              </div>
-            ))}
-            <button className="btn btn-add" onClick={() => update({ goals: [...data.goals, ""] })}>+ Add goal</button>
+        <div className="wizard-section">
+          <h3 className="wizard-section-title">{active.num}. {active.title}</h3>
+          <Editor doc={doc} setDoc={setDoc} />
+        </div>
 
-            <h4>BIM Uses (add the ones that apply)</h4>
-            {data.bimUses.map((u, i) => (
-              <div key={i} className="card" style={{ padding: 10 }}>
-                <div className="row">
-                  <Combobox value={u.name} onChange={(v) => update({ bimUses: data.bimUses.map((x, j) => (j === i ? { ...x, name: v } : x)) })} options={PENN_STATE_BIM_USES} />
-                  <select className="input" style={{ maxWidth: 140 }} value={u.phase} onChange={(e) => update({ bimUses: data.bimUses.map((x, j) => (j === i ? { ...x, phase: e.target.value } : x)) })}>
-                    {PHASES.map((p) => <option key={p} value={p}>{p}</option>)}
-                  </select>
-                  <select className="input" style={{ maxWidth: 110 }} value={u.priority} onChange={(e) => update({ bimUses: data.bimUses.map((x, j) => (j === i ? { ...x, priority: e.target.value } : x)) })}>
-                    {PRIORITIES.map((p) => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
-                  </select>
-                  <Combobox value={u.responsibleParty} onChange={(v) => update({ bimUses: data.bimUses.map((x, j) => (j === i ? { ...x, responsibleParty: v } : x)) })} options={PARTIES} />
-                  <button className="btn btn-icon" onClick={() => update({ bimUses: data.bimUses.filter((_, j) => j !== i) })}>✕</button>
-                </div>
-              </div>
-            ))}
-            <button className="btn btn-add" onClick={() => update({ bimUses: [...data.bimUses, { name: "", phase: "Design", priority: "medium", responsibleParty: "" }] })}>+ Add BIM Use</button>
+        <aside className="wizard-inspector">
+          <div className="inspector-block">
+            <h3>Compliance <span className="muted">({complianceCount}/{compliance.length})</span></h3>
+            <ul className="compliance-list">
+              {compliance.map((c) => (
+                <li key={c.item.id} className={c.met ? "ok" : "missing"}>
+                  <span className="compliance-mark">{c.met ? "✓" : "○"}</span>
+                  <span>
+                    <span className="compliance-code">{c.item.code}</span>
+                    <span className="compliance-label">{c.item.label}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
-        )}
-
-        {step === 2 && (
-          <div>
-            <h4>Team roles</h4>
-            {data.roles.map((r, i) => (
-              <div key={i} className="row" style={{ marginBottom: 6 }}>
-                <Combobox value={r.role} onChange={(v) => update({ roles: data.roles.map((x, j) => (j === i ? { ...x, role: v } : x)) })} options={BIM_ROLES} />
-                <input className="input" placeholder="Person" value={r.person} onChange={(e) => update({ roles: data.roles.map((x, j) => (j === i ? { ...x, person: e.target.value } : x)) })} />
-                <Combobox value={r.organization} onChange={(v) => update({ roles: data.roles.map((x, j) => (j === i ? { ...x, organization: v } : x)) })} options={PARTIES} />
-                <button className="btn btn-icon" onClick={() => update({ roles: data.roles.filter((_, j) => j !== i) })}>✕</button>
-              </div>
+          <div className="inspector-block">
+            <h3>Validation</h3>
+            {issues.length === 0 && <p className="ok">No issues</p>}
+            {issues.slice(0, 6).map((e, i) => (
+              <div key={i} className={`issue ${e.severity === "error" ? "issue-error" : "issue-warn"}`}>{e.path}: {e.message}</div>
             ))}
-            <button className="btn btn-add" onClick={() => update({ roles: [...data.roles, { role: "", person: "", organization: "" }] })}>+ Add role</button>
           </div>
-        )}
-
-        {step === 3 && (
-          <div>
-            <h4>Delivery milestones</h4>
-            {data.milestones.map((m, i) => (
-              <div key={i} className="row" style={{ marginBottom: 6 }}>
-                <Combobox value={m.name} onChange={(v) => update({ milestones: data.milestones.map((x, j) => (j === i ? { ...x, name: v } : x)) })} options={MILESTONE_NAMES} />
-                <input className="input" placeholder="Deliverable" value={m.deliverable} onChange={(e) => update({ milestones: data.milestones.map((x, j) => (j === i ? { ...x, deliverable: e.target.value } : x)) })} />
-                <input className="input" placeholder="Format (e.g. IFC, COBie)" value={m.format} onChange={(e) => update({ milestones: data.milestones.map((x, j) => (j === i ? { ...x, format: e.target.value } : x)) })} />
-                <button className="btn btn-icon" onClick={() => update({ milestones: data.milestones.filter((_, j) => j !== i) })}>✕</button>
-              </div>
-            ))}
-            <button className="btn btn-add" onClick={() => update({ milestones: [...data.milestones, { name: "", deliverable: "", format: "" }] })}>+ Add milestone</button>
-          </div>
-        )}
+        </aside>
       </div>
 
       <div className="wizard-footer">
-        <button className="btn" disabled={step === 0} onClick={() => setStep(step - 1)}>← Back</button>
-        {step < STEPS.length - 1 ? (
-          <button className="btn btn-primary" disabled={!canNext()} onClick={() => setStep(step + 1)}>Next →</button>
-        ) : (
-          <button className="btn btn-primary" onClick={() => onSubmit(buildDoc())}>Create project</button>
-        )}
+        <div className="row gap">
+          <label className="checkbox" title="Log a versioned snapshot on save">
+            <input type="checkbox" checked={commitOnSave} onChange={(e) => setCommitOnSave(e.target.checked)} />
+            <span>Commit revision on save</span>
+          </label>
+          {!isNew && (
+            <input
+              className="input author-input"
+              value={authorName || ""}
+              placeholder="Author name"
+              onChange={(e) => onAuthorChange?.(e.target.value)}
+            />
+          )}
+        </div>
+        <div className="row gap">
+          <button className="btn" disabled={stepIdx === 0} onClick={() => goTo(stepIdx - 1)}>← Back</button>
+          <button className="btn" disabled={stepIdx === sections.length - 1} onClick={() => goTo(stepIdx + 1)}>Next →</button>
+          <button className="btn btn-primary" onClick={() => onSubmit(doc, commitOnSave)}>
+            {isNew ? "Create project" : "Save changes"}
+          </button>
+        </div>
       </div>
     </div>
   );
