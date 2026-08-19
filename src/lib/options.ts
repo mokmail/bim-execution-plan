@@ -59,12 +59,13 @@ export const CLASSIFICATION_SYSTEMS = [
 ];
 
 export const LOD_SPECIFICATIONS = [
-  "BIMForum LOD Specification 2021",
-  "BIMForum LOD Specification 2020",
-  "NBS LOD 2-5",
-  "Level of Information Need (BS EN 17412-1)",
   "AIA E202 LOD 100-500",
+  "BIMForum LOD Specification 2020",
+  "BIMForum LOD Specification 2021",
+  "BIMForum LOD Specification 2023",
   "Custom",
+  "Level of Information Need (BS EN 17412-1)",
+  "NBS LOD 2-5",
 ];
 
 export const LOIN_LEVELS = [
@@ -125,29 +126,32 @@ export const SOFTWARE_DISCIPLINES = [
 ];
 
 export const AUTHORING_SOFTWARE = [
-  "Autodesk Revit",
+  "Allplan",
   "Autodesk AutoCAD",
   "Autodesk Civil 3D",
-  "Graphisoft Archicad",
-  "Bentley OpenBuildings",
+  "Autodesk Revit",
   "Bentley MicroStation",
+  "Bentley OpenBuildings",
+  "BlenderBIM",
+  "BricsCAD BIM",
+  "Dassault CATIA",
+  "Graphisoft Archicad",
+  "Rhino / Grasshopper",
+  "Tekla Structures",
   "Trimble SketchUp",
   "Vectorworks",
-  "Tekla Structures",
-  "Allplan",
-  "Dassault CATIA",
-  "Rhino / Grasshopper",
 ];
 
 export const COORDINATION_SOFTWARE = [
   "Autodesk Navisworks",
-  "Solibri Office",
-  "BIMcollab",
-  "Trimble Connect",
-  "Desite",
   "Bentley iTwin / Synchro",
+  "BIMcollab",
   "Dalux",
+  "Desite",
   "Revizto",
+  "Solibri Anywhere",
+  "Solibri Office",
+  "Trimble Connect",
 ];
 
 export const CDE_PLATFORMS = [
@@ -188,6 +192,7 @@ export const STANDARDS_OPTIONS = [
   "ISO 19650-4:2022 (Information exchange)",
   "ISO 19650-5:2020 (Security)",
   "ISO 19650-6:2025 (Health & safety)",
+  "ISO 16739-1:2024 (IFC data schema)",
   "PAS 1192-2:2013 (legacy)",
   "BS EN 17412-1 (Level of Information Need)",
   "NBIMS-US V4",
