@@ -72,6 +72,31 @@ export async function healthApi(): Promise<{ status: string }> {
   return request<{ status: string }>("/health");
 }
 
+// Result shape returned by the IFC/IDS model checker.
+export interface IfcCheckResult {
+  valid: boolean;
+  summary: { total: number; passed: number; failed: number };
+  results: { check: string; ok: boolean; detail?: string; count?: number; missing?: string[] }[];
+  issues: string[];
+}
+
+// Upload an IFC file + checks and run the model checker.
+export async function checkIfcApi(
+  file: File,
+  checks: { ifcVersion: string; entities: string[]; requiredProperties: Record<string, string[]> },
+): Promise<IfcCheckResult> {
+  const fd = new FormData();
+  fd.append("ifc", file);
+  fd.append("checks", JSON.stringify(checks));
+  const res = await fetch(`${BASE}/check-ifc`, { method: "POST", body: fd });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `IFC check failed (${res.status})`);
+  }
+  const data = await res.json();
+  return data.result;
+}
+
 // Export the plan to DOCX/PDF/HTML via the pandoc backend endpoint.
 export async function exportDocApi(
   markdown: string,

@@ -385,6 +385,27 @@ h4 { font-size: 0.9rem; color: var(--accent); margin-top: 1.2em; }
 .collab-pill { border-color: var(--border-2); color: var(--muted); }
 .collab-pill.on { color: var(--ok); border-color: var(--ok); }
 .collab-presence { color: var(--accent); border-color: var(--accent); }
+
+/* ---------- IFC / IDS model checker ---------- */
+.ifc-checker { display: flex; flex-direction: column; gap: 10px; }
+.ifc-hint { font-size: 0.78rem; line-height: 1.4; }
+.ifc-actions { display: flex; align-items: center; gap: 8px; }
+.ifc-checks-preview { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.ifc-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.ifc-ver { font-size: 0.72rem; }
+.ifc-error { font-size: 0.8rem; }
+.ifc-result { border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 0.82rem; }
+.ifc-result.ok { border-color: var(--ok); }
+.ifc-result.fail { border-color: var(--err); }
+.ifc-result-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.ifc-result.ok .ifc-result-head strong { color: var(--ok); }
+.ifc-result.fail .ifc-result-head strong { color: var(--err); }
+.ifc-result-list { list-style: none; padding: 0; margin: 0; }
+.ifc-result-list li { display: flex; gap: 6px; padding: 3px 0; align-items: flex-start; }
+.ifc-result-list li.fail { color: var(--err); }
+.ifc-result-list li.ok { color: var(--text); }
+.ifc-issues { margin-top: 6px; border-top: 1px solid var(--border); padding-top: 6px; }
+.ifc-issue { color: var(--err); font-size: 0.8rem; margin: 2px 0; }
 .sections-nav { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
 .nav-item {
   display: flex; align-items: center; gap: 8px;

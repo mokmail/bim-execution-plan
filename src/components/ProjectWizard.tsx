@@ -3,6 +3,7 @@ import type { BepDocument } from "../types/bep";
 import { sections, sectionForField } from "./sections";
 import { validateBep, complianceStatus } from "../lib/bep";
 import { useCollab } from "../hooks/useCollab";
+import { IfcChecker } from "./IfcChecker";
 
 interface Props {
   doc: BepDocument;
@@ -130,6 +131,9 @@ export function ProjectWizard({ doc, isNew, projectId, authorName, onAuthorChang
             {issues.slice(0, 6).map((e, i) => (
               <div key={i} className={`issue ${e.severity === "error" ? "issue-error" : "issue-warn"}`}>{e.path}: {e.message}</div>
             ))}
+          </div>
+          <div className="inspector-block">
+            <IfcChecker doc={doc} />
           </div>
         </aside>
       </div>
