@@ -7,6 +7,7 @@ import cors from "cors";
 import pg from "pg";
 import fs from "node:fs";
 import path from "node:path";
+import { execFile } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -230,6 +231,50 @@ app.post("/api/projects", async (req, res) => {
 app.delete("/api/projects/:id", async (req, res) => {
   await pool.query("DELETE FROM bep_projects WHERE id = $1", [req.params.id]);
   res.json({ ok: true });
+});
+
+// ---------- Export (pandoc: Markdown -> DOCX / PDF) ----------
+// The frontend sends the plan's Markdown; pandoc renders it to the requested
+// format. This is the Pandoc-based DOCX/PDF export the research recommended.
+app.post("/api/export", (req, res) => {
+  const { markdown, format = "docx", filename = "bim-execution-plan" } = req.body ?? {};
+  if (typeof markdown !== "string" || !markdown) {
+    return res.status(400).json({ error: "Missing markdown" });
+  }
+  if (!["docx", "pdf", "html", "md"].includes(format)) {
+    return res.status(400).json({ error: "Unsupported format" });
+  }
+
+  const safeName = slug(filename);
+  const to = format;
+  const tmpIn = path.join("/tmp", `${safeName}-${Date.now()}.md`);
+  const tmpOut = path.join("/tmp", `${safeName}-${Date.now()}.${to === "md" ? "md" : to}`);
+  fs.writeFileSync(tmpIn, markdown, "utf8");
+
+  const toFlag = to === "html" ? "html5" : to;
+  const args = [tmpIn, "-o", tmpOut, `--to=${toFlag}`, "--standalone", "--metadata", `title=${filename}`];
+  if (to === "pdf") args.push("--pdf-engine=weasyprint");
+  execFile(
+    "pandoc",
+    args,
+    (err) => {
+      if (err) {
+        console.error("pandoc failed:", err.message);
+        return res.status(500).json({ error: "pandoc failed: " + err.message });
+      }
+      const mime =
+        to === "docx" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        : to === "pdf" ? "application/pdf"
+        : to === "html" ? "text/html"
+        : "text/markdown";
+      const data = fs.readFileSync(tmpOut);
+      res.setHeader("Content-Type", mime);
+      res.setHeader("Content-Disposition", `attachment; filename="${safeName}.${to}"`);
+      res.send(data);
+      fs.rmSync(tmpIn, { force: true });
+      fs.rmSync(tmpOut, { force: true });
+    },
+  );
 });
 
 // ---------- Serve built frontend (production) ----------

@@ -18,6 +18,9 @@ interface Props {
   onDeleteProject: (id: string) => void;
   onExportMd: (id: string) => void;
   onExportJson: (id: string) => void;
+  onExportDocx: (id: string) => void;
+  onExportPdf: (id: string) => void;
+  onExportIds: (id: string) => void;
 }
 
 export function Dashboard({
@@ -32,6 +35,9 @@ export function Dashboard({
   onDeleteProject,
   onExportMd,
   onExportJson,
+  onExportDocx,
+  onExportPdf,
+  onExportIds,
 }: Props) {
   const a = analytics;
   const compliancePct = a && a.compliance.total > 0 ? Math.round((a.compliance.met / a.compliance.total) * 100) : 0;
@@ -202,7 +208,10 @@ export function Dashboard({
                 <div className="muted">Updated {new Date(p.updatedAt).toLocaleString()}</div>
               </div>
               <div className="row gap">
-                <button className="btn btn-ghost" title="Export markdown" onClick={() => onExportMd(p.id)}>Export</button>
+                <button className="btn btn-ghost" title="Export DOCX (Word)" onClick={() => onExportDocx(p.id)}>DOCX</button>
+                <button className="btn btn-ghost" title="Export PDF" onClick={() => onExportPdf(p.id)}>PDF</button>
+                <button className="btn btn-ghost" title="Export IDS (buildingSMART)" onClick={() => onExportIds(p.id)}>IDS</button>
+                <button className="btn btn-ghost" title="Export markdown" onClick={() => onExportMd(p.id)}>MD</button>
                 <button className="btn btn-ghost" title="Download .bep JSON" onClick={() => onExportJson(p.id)}>.bep</button>
                 <button className="btn btn-ghost" title="Delete project" onClick={() => onDeleteProject(p.id)}>✕</button>
                 <button className="btn btn-primary" onClick={() => onOpenProject(p.id)} disabled={loading}>Edit</button>

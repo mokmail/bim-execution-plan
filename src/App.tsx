@@ -17,10 +17,12 @@ import {
   deleteProjectApi,
   healthApi,
   analyticsApi,
+  exportDocApi,
   projectIdFromName,
   type ProjectMeta,
   type Analytics,
 } from "./lib/api";
+import { bepToIds } from "./lib/bep";
 import { getTemplate } from "./lib/templates";
 import { ProjectWizard } from "./components/ProjectWizard";
 import { Dashboard } from "./components/Dashboard";
@@ -178,6 +180,32 @@ function App() {
     showToast("Markdown exported — convert to DOCX/PDF with pandoc (see docs)");
   };
 
+  const exportDocxFor = async (id: string) => {
+    const b = await getBundleApi(id);
+    try {
+      await exportDocApi(bepToMarkdown(b.current), "docx", b.current.projectName);
+      showToast("DOCX exported via pandoc");
+    } catch (e: any) {
+      showToast("DOCX export failed: " + e.message);
+    }
+  };
+
+  const exportPdfFor = async (id: string) => {
+    const b = await getBundleApi(id);
+    try {
+      await exportDocApi(bepToMarkdown(b.current), "pdf", b.current.projectName);
+      showToast("PDF exported via pandoc");
+    } catch (e: any) {
+      showToast("PDF export failed: " + e.message);
+    }
+  };
+
+  const exportIdsFor = async (id: string) => {
+    const b = await getBundleApi(id);
+    downloadFile(`${slug(b.current.projectName)}-ids.xml`, bepToIds(b.current), "application/xml");
+    showToast("IDS exported (buildingSMART Information Delivery Specification)");
+  };
+
   // ---------------- Render ----------------
   if (view === "wiki") {
     return (
@@ -208,6 +236,9 @@ function App() {
             const b = await getBundleApi(id);
             exportJsonFor(b);
           }}
+          onExportDocx={exportDocxFor}
+          onExportPdf={exportPdfFor}
+          onExportIds={exportIdsFor}
         />
         <div className="dash-import">
           <button className="btn" onClick={() => fileInput.current?.click()} disabled={!serverOk}>Import .bep JSON</button>

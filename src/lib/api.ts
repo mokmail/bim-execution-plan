@@ -72,6 +72,36 @@ export async function healthApi(): Promise<{ status: string }> {
   return request<{ status: string }>("/health");
 }
 
+// Export the plan to DOCX/PDF/HTML via the pandoc backend endpoint.
+export async function exportDocApi(
+  markdown: string,
+  format: "docx" | "pdf" | "html",
+  filename: string,
+): Promise<void> {
+  const res = await fetch(`${BASE}/export`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ markdown, format, filename }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `export failed (${res.status})`);
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${slug(filename)}.${format}`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function slug(s: string): string {
+  return s.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "bep";
+}
+
 export interface Analytics {
   totalProjects: number;
   preAppointment: number;
