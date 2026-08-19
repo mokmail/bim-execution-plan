@@ -1,6 +1,7 @@
 node_modules
 dist
 dist-server
+server/ifc-venv
 .git
 .gitignore
 *.md

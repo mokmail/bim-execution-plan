@@ -10,6 +10,7 @@ import path from "node:path";
 import { execFile } from "node:child_process";
 import { createServer } from "node:http";
 import { fileURLToPath } from "node:url";
+import multer from "multer";
 import { attachCollab, setRoomChangeHook } from "./collab.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -277,6 +278,51 @@ app.post("/api/export", (req, res) => {
       fs.rmSync(tmpOut, { force: true });
     },
   );
+});
+
+// ---------- IFC/IDS model checking ----------
+// Runs the Python/ifcopenshell checker against an uploaded IFC file, using the
+// BEP's data-exchange requirements. This is the research's "emerging frontier":
+// linking BEP deliverables to model-checking and IDS/IFC exchange.
+const upload = multer({ dest: "/tmp/bep-uploads", limits: { fileSize: 50 * 1024 * 1024 } });
+
+app.post("/api/check-ifc", upload.single("ifc"), (req, res) => {
+  const checks = req.body?.checks ? JSON.parse(req.body.checks) : {};
+  if (!req.file) {
+    return res.status(400).json({ error: "Missing IFC file (multipart field 'ifc')" });
+  }
+
+  // Find ifcopenshell venv in several likely locations.
+  const pyCandidates = [
+    path.join(__dirname, "ifc-venv", "bin", "python"), // dev: dist-server/ifc-venv (via build:server cp)
+    path.join(__dirname, "..", "server", "ifc-venv", "bin", "python"), // dev: repo layout
+    path.join("/app", "ifc-venv", "bin", "python"), // Docker runtime
+    "/usr/bin/python3",
+    "python3",
+  ];
+  const python = pyCandidates.find((p) => fs.existsSync(p)) || "python3";
+  // check.py may be co-located with the compiled server OR in the venv dir.
+  const script =
+    [path.join(__dirname, "check.py"), path.join(path.dirname(python), "check.py")]
+      .find((p) => fs.existsSync(p)) || path.join(__dirname, "check.py");
+
+  // Build a temp checks file for the Python script.
+  const tmpChecks = path.join("/tmp", `checks-${Date.now()}.json`);
+  fs.writeFileSync(tmpChecks, JSON.stringify(checks), "utf8");
+
+  execFile(python, [script, req.file.path, tmpChecks], (err, stdout, stderr) => {
+    fs.rmSync(tmpChecks, { force: true });
+    fs.rmSync(req.file!.path, { force: true });
+    if (err) {
+      return res.status(500).json({ error: "checker failed: " + (stderr || err.message) });
+    }
+    try {
+      const result = JSON.parse(stdout);
+      res.json({ ok: true, result });
+    } catch {
+      res.status(500).json({ error: "bad checker output: " + stdout });
+    }
+  });
 });
 
 // ---------- Serve built frontend (production) ----------

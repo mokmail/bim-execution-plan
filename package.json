@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && tsc -p server/tsconfig.json && cp server/schema.sql dist-server/schema.sql",
+    "build": "tsc -b && vite build && tsc -p server/tsconfig.json && cp server/schema.sql dist-server/schema.sql && cp server/check.py dist-server/check.py",
     "build:web": "tsc -b && vite build",
-    "build:server": "tsc -p server/tsconfig.json && cp server/schema.sql dist-server/schema.sql",
+    "build:server": "tsc -p server/tsconfig.json && cp server/schema.sql dist-server/schema.sql && cp server/check.py dist-server/check.py",
     "start": "node dist-server/index.js",
     "lint": "oxlint",
     "preview": "vite preview"
@@ -15,6 +15,7 @@
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "multer": "^2.2.0",
     "pg": "^8.23.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.0",
+    "@types/multer": "^2.2.0",
     "@types/node": "^24.13.3",
     "@types/pg": "^8.15.6",
     "@types/react": "^19.2.17",
