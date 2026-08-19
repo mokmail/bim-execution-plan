@@ -15,6 +15,7 @@ interface Props {
   onNewDelivery: () => void;
   onOpenWiki: () => void;
   onOpenProject: (id: string) => void;
+  onOpenIfc: (id: string) => void;
   onDeleteProject: (id: string) => void;
   onExportMd: (id: string) => void;
   onExportJson: (id: string) => void;
@@ -32,6 +33,7 @@ export function Dashboard({
   onNewDelivery,
   onOpenWiki,
   onOpenProject,
+  onOpenIfc,
   onDeleteProject,
   onExportMd,
   onExportJson,
@@ -208,6 +210,7 @@ export function Dashboard({
                 <div className="muted">Updated {new Date(p.updatedAt).toLocaleString()}</div>
               </div>
               <div className="row gap">
+                <button className="btn btn-ifc" title="Upload an IFC model and validate against this BEP" onClick={() => onOpenIfc(p.id)}>◎ IFC Check</button>
                 <button className="btn btn-ghost" title="Export DOCX (Word)" onClick={() => onExportDocx(p.id)}>DOCX</button>
                 <button className="btn btn-ghost" title="Export PDF" onClick={() => onExportPdf(p.id)}>PDF</button>
                 <button className="btn btn-ghost" title="Export IDS (buildingSMART)" onClick={() => onExportIds(p.id)}>IDS</button>

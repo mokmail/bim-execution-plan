@@ -385,9 +385,12 @@ h4 { font-size: 0.9rem; color: var(--accent); margin-top: 1.2em; }
 .collab-pill { border-color: var(--border-2); color: var(--muted); }
 .collab-pill.on { color: var(--ok); border-color: var(--ok); }
 .collab-presence { color: var(--accent); border-color: var(--accent); }
+.btn-ifc { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.btn-ifc:hover { background: var(--accent); color: #fff; }
 
 /* ---------- IFC / IDS model checker ---------- */
 .ifc-checker { display: flex; flex-direction: column; gap: 10px; }
+.ifc-inspector-block { border: 1px solid var(--accent); border-radius: 8px; padding: 12px; background: var(--bg); }
 .ifc-hint { font-size: 0.78rem; line-height: 1.4; }
 .ifc-actions { display: flex; align-items: center; gap: 8px; }
 .ifc-checks-preview { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }

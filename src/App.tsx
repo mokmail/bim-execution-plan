@@ -227,6 +227,7 @@ function App() {
           onNewDelivery={() => openNewWizard("delivery")}
           onOpenWiki={() => setView("wiki")}
           onOpenProject={openProject}
+          onOpenIfc={openProject}
           onDeleteProject={removeProject}
           onExportMd={async (id) => {
             const b = await getBundleApi(id);

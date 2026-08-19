@@ -132,7 +132,7 @@ export function ProjectWizard({ doc, isNew, projectId, authorName, onAuthorChang
               <div key={i} className={`issue ${e.severity === "error" ? "issue-error" : "issue-warn"}`}>{e.path}: {e.message}</div>
             ))}
           </div>
-          <div className="inspector-block">
+          <div className="inspector-block ifc-inspector-block">
             <IfcChecker doc={doc} />
           </div>
         </aside>
