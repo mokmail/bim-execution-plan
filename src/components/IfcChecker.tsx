@@ -50,7 +50,8 @@ export function IfcChecker({ doc }: { doc: BepDocument }) {
     setResult(null);
     try {
       const checks = buildChecks();
-      const res = await checkIfcApi(file, checks);
+      const eff = checks.entities.length > 0 ? checks : { ...checks, entities: DEFAULT_ENTITIES };
+      const res = await checkIfcApi(file, eff);
       setResult(res);
     } catch (e: any) {
       setError(e.message || "IFC check failed");
@@ -61,6 +62,7 @@ export function IfcChecker({ doc }: { doc: BepDocument }) {
 
   const checks = buildChecks();
   const hasEntities = checks.entities.length > 0;
+  const entities = hasEntities ? checks.entities : DEFAULT_ENTITIES;
 
   return (
     <div className="ifc-checker">
@@ -70,7 +72,7 @@ export function IfcChecker({ doc }: { doc: BepDocument }) {
       </p>
 
       <div className="ifc-actions">
-        <button className="btn" onClick={() => inputRef.current?.click()} disabled={busy || !hasEntities}>
+        <button className="btn" onClick={() => inputRef.current?.click()} disabled={busy}>
           {busy ? "Checking…" : "Upload .ifc model"}
         </button>
         <input
@@ -84,14 +86,14 @@ export function IfcChecker({ doc }: { doc: BepDocument }) {
 
       {!hasEntities && (
         <p className="muted ifc-hint">
-          Add LOD matrix rows or data exchanges to define what to check.
+          No LOD/exchange entities found in this BEP — checking common building elements. Add LOD matrix rows to target specific entities.
         </p>
       )}
 
       <div className="ifc-checks-preview">
-        {checks.entities.length > 0 && (
+        {entities.length > 0 && (
           <div className="ifc-tags">
-            {checks.entities.map((e) => <span key={e} className="chip chip-on">{e}</span>)}
+            {entities.map((e) => <span key={e} className="chip chip-on">{e}</span>)}
           </div>
         )}
         {checks.ifcVersion && <span className="muted ifc-ver">IFC: {checks.ifcVersion}</span>}
@@ -149,3 +151,13 @@ function guessIfcEntity(label: string): string | null {
   if (/pipe/.test(l)) return "IfcPipeSegment";
   return null;
 }
+
+// Fallback set of common building elements checked when the BEP has no LOD/exchange entities.
+const DEFAULT_ENTITIES = [
+  "IfcWall",
+  "IfcSlab",
+  "IfcDoor",
+  "IfcWindow",
+  "IfcColumn",
+  "IfcBeam",
+];
