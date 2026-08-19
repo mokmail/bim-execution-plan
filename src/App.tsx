@@ -262,6 +262,7 @@ function App() {
       <ProjectWizard
         doc={bundle.current}
         isNew={isNew}
+        projectId={activeProjectId}
         authorName={authorName}
         onAuthorChange={(v) => {
           setAuthorName(v);

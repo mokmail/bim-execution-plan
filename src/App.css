@@ -382,6 +382,9 @@ h4 { font-size: 0.9rem; color: var(--accent); margin-top: 1.2em; }
 .project-title { padding: 10px 8px; border-bottom: 1px solid var(--border); margin-bottom: 10px; font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .pill { font-size: 0.7rem; background: var(--bg-3); border: 1px solid var(--border); padding: 2px 8px; border-radius: 20px; color: var(--muted); }
 .pill-mode { color: var(--accent); border-color: var(--accent); }
+.collab-pill { border-color: var(--border-2); color: var(--muted); }
+.collab-pill.on { color: var(--ok); border-color: var(--ok); }
+.collab-presence { color: var(--accent); border-color: var(--accent); }
 .sections-nav { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
 .nav-item {
   display: flex; align-items: center; gap: 8px;

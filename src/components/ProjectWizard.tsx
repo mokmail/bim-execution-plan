@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import type { BepDocument } from "../types/bep";
 import { sections, sectionForField } from "./sections";
 import { validateBep, complianceStatus } from "../lib/bep";
+import { useCollab } from "../hooks/useCollab";
 
 interface Props {
   doc: BepDocument;
   isNew: boolean;
+  projectId: string | null;
   authorName?: string;
   onAuthorChange?: (v: string) => void;
   onDocChange: (d: BepDocument) => void;
@@ -16,23 +18,36 @@ interface Props {
 // Single-interface wizard covering all 14 BEP sections.
 // Reuses the section editors from sections.tsx; works for both
 // create (blank/template doc) and edit (pre-filled existing doc).
-export function ProjectWizard({ doc, isNew, authorName, onAuthorChange, onDocChange, onSubmit, onCancel }: Props) {
+export function ProjectWizard({ doc, isNew, projectId, authorName, onAuthorChange, onDocChange, onSubmit, onCancel }: Props) {
   const [stepIdx, setStepIdx] = useState(0);
   const [commitOnSave, setCommitOnSave] = useState(!isNew);
   const nameInput = useRef<HTMLInputElement>(null);
+  const { peerDoc, presence, connected, sendUpdate } = useCollab(isNew ? null : projectId, doc);
 
   // Auto-focus the project name when creating a new plan.
   useEffect(() => {
     if (isNew) nameInput.current?.focus();
   }, [isNew]);
 
+  // When a remote peer update arrives, apply it to the editor.
+  useEffect(() => {
+    if (peerDoc) onDocChange(peerDoc);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [peerDoc]);
+
+  // Broadcast local doc changes to collaborators.
+  const broadcast = (updater: (d: BepDocument) => BepDocument) => {
+    const next = updater(doc);
+    onDocChange(next);
+    sendUpdate(next);
+  };
+  const setDoc = (updater: (d: BepDocument) => BepDocument) => broadcast(updater);
+
   const active = sections[stepIdx];
   const Editor = active.Component;
   const issues = validateBep(doc);
   const compliance = complianceStatus(doc);
   const complianceCount = compliance.filter((c) => c.met).length;
-
-  const setDoc = (updater: (d: BepDocument) => BepDocument) => onDocChange(updater(doc));
 
   const goTo = (i: number) => {
     if (i >= 0 && i < sections.length) setStepIdx(i);
@@ -55,6 +70,14 @@ export function ProjectWizard({ doc, isNew, authorName, onAuthorChange, onDocCha
           />
           <span className="pill pill-mode">{doc.mode}</span>
           <span className="pill">{complianceCount}/{compliance.length} compliance</span>
+          {!isNew && (
+            <span className={`pill collab-pill ${connected ? "on" : ""}`} title={connected ? "Live collaboration connected" : "Collaboration offline"}>
+              {connected ? "● live" : "○ offline"}
+            </span>
+          )}
+          {!isNew && connected && Object.keys(presence).length > 0 && (
+            <span className="pill collab-presence">{Object.keys(presence).length} online</span>
+          )}
         </div>
         <button className="btn btn-ghost" onClick={onCancel}>Cancel</button>
       </div>

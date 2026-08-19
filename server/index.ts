@@ -8,7 +8,9 @@ import pg from "pg";
 import fs from "node:fs";
 import path from "node:path";
 import { execFile } from "node:child_process";
+import { createServer } from "node:http";
 import { fileURLToPath } from "node:url";
+import { attachCollab, setRoomChangeHook } from "./collab.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -289,7 +291,24 @@ if (fs.existsSync(distDir)) {
 // ---------- Boot ----------
 async function main() {
   await initDb();
-  app.listen(PORT, () => {
+
+  // Persist collaborative edits (room id = project id) back to PostgreSQL.
+  setRoomChangeHook(async (room, current) => {
+    try {
+      if (typeof room !== "string" || !current) return;
+      await pool.query(
+        `UPDATE bep_projects SET current = $2, updated_at = now()
+         WHERE id = $1`,
+        [room, JSON.stringify(current)],
+      );
+    } catch (e) {
+      console.error("collab persist failed:", e);
+    }
+  });
+
+  const server = createServer(app);
+  attachCollab(server);
+  server.listen(PORT, () => {
     console.log(`BEP backend listening on port ${PORT}`);
   });
 }
