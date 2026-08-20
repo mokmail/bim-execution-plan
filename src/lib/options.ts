@@ -76,7 +76,13 @@ export const LOIN_LEVELS = [
   "Not required",
 ];
 
-export const IFC_VERSIONS = ["IFC 2x3", "IFC 4", "IFC 4.3", "IFC 4.3.2 (IFC Reference View)"];
+export const IFC_VERSIONS = [
+  "IFC 2x3",
+  "IFC 4",
+  "IFC 4.3",
+  "IFC 4.3 Add2 (2024)",
+  "IFC 4.3.2 (IFC Reference View)",
+];
 export const MVD_OPTIONS = [
   "Reference View",
   "Design Transfer View",
@@ -95,6 +101,10 @@ export const EXCHANGE_FORMATS = [
   "Native (DWG)",
   "Native (DGN)",
   "IFC XML",
+  "IFC JSON",
+  "IFCZIP",
+  "ifcOWL (RDF/TTL)",
+  "Structural Analysis Format (SAF)",
   "CSV / XLSX",
   "PDF",
   "Other",
@@ -149,6 +159,7 @@ export const COORDINATION_SOFTWARE = [
   "Dalux",
   "Desite",
   "Revizto",
+  "Simplebim",
   "Solibri Anywhere",
   "Solibri Office",
   "Trimble Connect",
@@ -193,6 +204,8 @@ export const STANDARDS_OPTIONS = [
   "ISO 19650-5:2020 (Security)",
   "ISO 19650-6:2025 (Health & safety)",
   "ISO 16739-1:2024 (IFC data schema)",
+  "BS 1192-4:2014 (COBie code of practice)",
+  "ISO 23386 / ISO 23387 (Product Data Templates)",
   "PAS 1192-2:2013 (legacy)",
   "BS EN 17412-1 (Level of Information Need)",
   "NBIMS-US V4",
