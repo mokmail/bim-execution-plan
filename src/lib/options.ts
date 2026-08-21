@@ -104,6 +104,7 @@ export const EXCHANGE_FORMATS = [
   "IFC JSON",
   "IFCZIP",
   "ifcOWL (RDF/TTL)",
+  "CityGML (OGC)",
   "Structural Analysis Format (SAF)",
   "CSV / XLSX",
   "PDF",
@@ -139,6 +140,7 @@ export const AUTHORING_SOFTWARE = [
   "Allplan",
   "Autodesk AutoCAD",
   "Autodesk Civil 3D",
+  "Autodesk Forma",
   "Autodesk Revit",
   "Bentley MicroStation",
   "Bentley OpenBuildings",
@@ -174,6 +176,7 @@ export const CDE_PLATFORMS = [
   "Aconex",
   "Think Project",
   "Bentley ProjectWise",
+  "Bricsys 24/7",
   "Microsoft SharePoint / Teams",
   "Common Data Environment (other)",
 ];
