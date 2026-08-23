@@ -8,6 +8,7 @@ export const DELIVERY_METHODS = [
   "Construction Manager (CM)",
   "Construction Manager at Risk (CMAR)",
   "Engineering, Procurement & Construction (EPC)",
+  "Progressive Design-Build (PDB)",
   "Public-Private Partnership (PPP)",
 ];
 
@@ -55,6 +56,7 @@ export const CLASSIFICATION_SYSTEMS = [
   "NRM / CESMM (UK)",
   "CoClass (Sweden)",
   "Cuneco (Denmark)",
+  "ISO 12006-2 (framework)",
   "Other",
 ];
 
@@ -82,6 +84,7 @@ export const IFC_VERSIONS = [
   "IFC 4.3",
   "IFC 4.3 Add2 (2024)",
   "IFC 4.3.2 (IFC Reference View)",
+  "IFC 5 (in development)",
 ];
 export const MVD_OPTIONS = [
   "Reference View",
@@ -105,6 +108,8 @@ export const EXCHANGE_FORMATS = [
   "IFCZIP",
   "ifcOWL (RDF/TTL)",
   "CityGML (OGC)",
+  "glTF",
+  "LandXML",
   "Structural Analysis Format (SAF)",
   "CSV / XLSX",
   "PDF",
@@ -158,6 +163,7 @@ export const COORDINATION_SOFTWARE = [
   "Autodesk Navisworks",
   "Bentley iTwin / Synchro",
   "BIMcollab",
+  "BIM Track",
   "Dalux",
   "Desite",
   "Revizto",
@@ -170,6 +176,7 @@ export const COORDINATION_SOFTWARE = [
 
 export const CDE_PLATFORMS = [
   "Autodesk Construction Cloud / BIM 360",
+  "Autodesk Docs",
   "Trimble Connect",
   "Procore",
   "Dalux Box",
@@ -178,6 +185,8 @@ export const CDE_PLATFORMS = [
   "Think Project",
   "Bentley ProjectWise",
   "Bricsys 24/7",
+  "Fieldwire",
+  "Kahua",
   "Microsoft SharePoint / Teams",
   "Common Data Environment (other)",
 ];
@@ -188,6 +197,7 @@ export const SECURITY_STANDARDS = [
   "UK NCSC / CE marking for sensitive data",
   "GDPR-compliant data handling",
   "ISO 27001",
+  "NIST SP 800-171",
   "Other",
 ];
 
@@ -208,6 +218,7 @@ export const STANDARDS_OPTIONS = [
   "ISO 19650-5:2020 (Security)",
   "ISO 19650-6:2025 (Health & safety)",
   "ISO 16739-1:2024 (IFC data schema)",
+  "ISO 29481 (BIM Information Delivery Manual / IDM)",
   "BS 1192-4:2014 (COBie code of practice)",
   "ISO 23386 / ISO 23387 (Product Data Templates)",
   "PAS 1192-2:2013 (legacy)",
@@ -244,6 +255,10 @@ export const COORDINATE_SYSTEMS = [
   "WGS84 geographic",
   "UK National Grid (OSGB36)",
   "US State Plane",
+  "GDA2020 (Australia)",
+  "NZGD2000 (New Zealand)",
+  "SVY21 (Singapore)",
+  "JGD2011 (Japan)",
 ];
 
 // ---- Additional predefined values for fields across all 14 sections ----
