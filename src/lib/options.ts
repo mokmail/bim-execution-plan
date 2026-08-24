@@ -164,6 +164,8 @@ export const COORDINATION_SOFTWARE = [
   "Bentley iTwin / Synchro",
   "BIMcollab",
   "BIM Track",
+  "BIMvision",
+  "Bluebeam Revu",
   "Dalux",
   "Desite",
   "Revizto",
