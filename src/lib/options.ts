@@ -65,6 +65,7 @@ export const LOD_SPECIFICATIONS = [
   "BIMForum LOD Specification 2020",
   "BIMForum LOD Specification 2021",
   "BIMForum LOD Specification 2023",
+  "BIMForum LOD Specification 2025",
   "Custom",
   "Level of Information Need (BS EN 17412-1)",
   "NBS LOD 2-5",
@@ -236,6 +237,7 @@ export const WORK_STAGE_REFERENCES = [
   "RIBA Plan of Work 2020",
   "AIA Project Delivery Phases",
   "ISO 19650-2 information delivery",
+  "IMI Framework (UK)",
   "NATSPEC / AS ISO 19650 work stages",
   "Custom",
 ];
