@@ -233,6 +233,7 @@ export const STANDARDS_OPTIONS = [
   "PAS 1192-2:2013 (legacy)",
   "BS EN 17412-1 (Level of Information Need)",
   "ISO 21597 (ICDD - Information Container for Data Drop)",
+  "buildingSMART OpenCDE API (BCF/Documents/Dictionary)",
   "NBIMS-US V4",
   "AIA E203 / G202",
   "CIC BIM Protocol",
