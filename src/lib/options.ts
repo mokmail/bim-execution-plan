@@ -2,29 +2,40 @@
 // (ISO 19650, NBIMS-US, BIMForum, buildingSMART, Penn State BIM uses).
 
 export const DELIVERY_METHODS = [
-  "Design-Bid-Build (DBB)",
-  "Design-Build (DB)",
-  "Integrated Project Delivery (IPD)",
+  "Alliance Contracting",
   "Construction Manager (CM)",
   "Construction Manager at Risk (CMAR)",
+  "Design-Bid-Build (DBB)",
+  "Design-Build (DB)",
+  "Design-Build-Operate-Maintain (DBOM)",
   "Engineering, Procurement & Construction (EPC)",
+  "Integrated Project Delivery (IPD)",
+  "Job Order Contracting (JOC)",
   "Progressive Design-Build (PDB)",
   "Public-Private Partnership (PPP)",
 ];
 
 export const PROJECT_SECTORS = [
-  "Residential",
+  "Aviation",
+  "Civic / Public",
   "Commercial / Office",
-  "Healthcare",
+  "Data Centre",
   "Education",
+  "Energy / Utilities",
+  "Healthcare",
+  "Heritage / Conservation",
+  "Hospitality",
   "Industrial / Manufacturing",
   "Infrastructure / Civil",
-  "Transportation",
-  "Energy / Utilities",
-  "Hospitality",
+  "Marine / Ports",
+  "Mixed-Use",
+  "Oil & Gas",
+  "Rail",
+  "Residential",
   "Retail",
-  "Civic / Public",
-  "Data Centre",
+  "Sports / Leisure",
+  "Transportation",
+  "Water / Wastewater",
 ];
 
 export const DELIVERY_METHOD_SHORT = [
@@ -38,28 +49,34 @@ export const DELIVERY_METHOD_SHORT = [
 ];
 
 export const CONTRACT_ROUTES = [
-  "Lump Sum",
   "Cost Plus / Cost Reimbursable",
   "Design-Build Contract",
-  "Traditional (Design-Bid-Build) Contract",
-  "Management Contracting",
-  "Target Cost",
+  "FIDIC",
   "Framework Agreement",
+  "JCT",
+  "Lump Sum",
+  "Management Contracting",
+  "NEC4",
+  "Target Cost",
+  "Traditional (Design-Bid-Build) Contract",
+  "Two-Stage Open Book",
 ];
 
 export const CLASSIFICATION_SYSTEMS = [
-  "Uniclass 2015 (UK)",
-  "OmniClass (US)",
-  "Uniformat II",
-  "MasterFormat",
-  "UniFormat",
-  "NRM / CESMM (UK)",
+  "CCS (Canada)",
+  "CI/SfB (UK)",
   "CoClass (Sweden)",
   "Cuneco (Denmark)",
   "DIN 276 (Germany)",
-  "CI/SfB (UK)",
   "ISO 12006-2 (framework)",
+  "MasterFormat",
+  "NRM / CESMM (UK)",
+  "OmniClass (US)",
   "Other",
+  "UniFormat",
+  "UniFormat 2010",
+  "Uniclass 2015 (UK)",
+  "Uniformat II",
 ];
 
 export const LOD_SPECIFICATIONS = [
@@ -90,34 +107,34 @@ export const IFC_VERSIONS = [
   "IFC 5 (in development)",
 ];
 export const MVD_OPTIONS = [
-  "Reference View",
-  "Design Transfer View",
   "Coordination View 2.0",
-  "Quantity Takeoff",
-  "Structural Analysis View",
   "Custom",
+  "Design Transfer View",
+  "Quantity Takeoff",
+  "Reference View",
+  "Structural Analysis View",
 ];
 
 export const EXCHANGE_FORMATS = [
-  "IFC",
-  "COBie",
   "BCF",
   "BCF 3.0",
+  "CityGML (OGC)",
+  "COBie",
+  "CSV / XLSX",
+  "glTF",
   "IDS",
   "IDS 1.0",
-  "Native (RVT)",
-  "Native (DWG)",
-  "Native (DGN)",
-  "IFC XML",
+  "IFC",
   "IFC JSON",
+  "IFC XML",
   "IFCZIP",
   "ifcOWL (RDF/TTL)",
-  "CityGML (OGC)",
-  "glTF",
   "LandXML",
-  "Structural Analysis Format (SAF)",
-  "CSV / XLSX",
+  "Native (DGN)",
+  "Native (DWG)",
+  "Native (RVT)",
   "PDF",
+  "Structural Analysis Format (SAF)",
   "Other",
 ];
 
@@ -132,18 +149,18 @@ export const EXCHANGE_LOD = [
 
 export const SOFTWARE_DISCIPLINES = [
   "Architecture",
-  "Structure",
-  "Mechanical",
-  "Electrical",
-  "Plumbing",
-  "MEP (combined)",
   "Civil",
-  "Landscape",
-  "Interior",
-  "Fire Protection",
   "Coordination",
-  "Quantity / Cost",
+  "Electrical",
   "Facility Management",
+  "Fire Protection",
+  "Interior",
+  "Landscape",
+  "Mechanical",
+  "MEP (combined)",
+  "Plumbing",
+  "Quantity / Cost",
+  "Structure",
 ];
 
 export const AUTHORING_SOFTWARE = [
@@ -155,6 +172,7 @@ export const AUTHORING_SOFTWARE = [
   "Autodesk Revit",
   "Bentley MicroStation",
   "Bentley OpenBuildings",
+  "Bentley OpenRoads",
   "BlenderBIM",
   "BricsCAD BIM",
   "Cadwork",
@@ -182,34 +200,36 @@ export const COORDINATION_SOFTWARE = [
   "Solibri Office",
   "Speckle",
   "Trimble Connect",
+  "UsBIM.viewer",
 ];
 
 export const CDE_PLATFORMS = [
+  "Aconex",
+  "Asite",
   "Autodesk Construction Cloud / BIM 360",
   "Autodesk Docs",
-  "Trimble Connect",
-  "Procore",
-  "Dalux Box",
-  "Asite",
-  "Aconex",
-  "Think Project",
   "Bentley ProjectWise",
   "Bricsys 24/7",
   "Catenda Hub",
+  "Common Data Environment (other)",
+  "Dalux Box",
   "Fieldwire",
   "Kahua",
   "Microsoft SharePoint / Teams",
-  "Common Data Environment (other)",
+  "Newforma",
+  "Procore",
+  "Think Project",
+  "Trimble Connect",
 ];
 
 export const SECURITY_STANDARDS = [
-  "ISO 19650-5:2020",
-  "PAS 1192-5",
-  "UK NCSC / CE marking for sensitive data",
   "GDPR-compliant data handling",
+  "ISO 19650-5:2020",
   "ISO 27001",
   "NIST SP 800-171",
   "Other",
+  "PAS 1192-5",
+  "UK NCSC / CE marking for sensitive data",
 ];
 
 export const SECURITY_CLASSIFICATIONS = [
@@ -222,34 +242,34 @@ export const SECURITY_CLASSIFICATIONS = [
 ];
 
 export const STANDARDS_OPTIONS = [
+  "AIA E203 / G202",
+  "BS 1192-4:2014 (COBie code of practice)",
+  "BS EN 17412-1 (Level of Information Need)",
+  "buildingSMART OpenCDE API (BCF/Documents/Dictionary)",
+  "CIC BIM Protocol",
+  "ISO 12006-3 (buildingSMART Data Dictionary / bSDD)",
+  "ISO 16739-1:2024 (IFC data schema)",
   "ISO 19650-1:2018 (Concepts & principles)",
   "ISO 19650-2:2018 (Delivery phase)",
   "ISO 19650-3:2020 (Operational phase)",
   "ISO 19650-4:2022 (Information exchange)",
   "ISO 19650-5:2020 (Security)",
   "ISO 19650-6:2025 (Health & safety)",
-  "ISO 16739-1:2024 (IFC data schema)",
-  "ISO 29481 (BIM Information Delivery Manual / IDM)",
-  "BS 1192-4:2014 (COBie code of practice)",
-  "ISO 23386 / ISO 23387 (Product Data Templates)",
-  "ISO 12006-3 (buildingSMART Data Dictionary / bSDD)",
-  "PAS 1192-2:2013 (legacy)",
-  "BS EN 17412-1 (Level of Information Need)",
   "ISO 21597 (ICDD - Information Container for Data Drop)",
-  "buildingSMART OpenCDE API (BCF/Documents/Dictionary)",
+  "ISO 23386 / ISO 23387 (Product Data Templates)",
+  "ISO 29481 (BIM Information Delivery Manual / IDM)",
   "NBIMS-US V4",
-  "AIA E203 / G202",
-  "CIC BIM Protocol",
   "Other",
+  "PAS 1192-2:2013 (legacy)",
 ];
 
 export const WORK_STAGE_REFERENCES = [
-  "RIBA Plan of Work 2020",
   "AIA Project Delivery Phases",
-  "ISO 19650-2 information delivery",
-  "IMI Framework (UK)",
-  "NATSPEC / AS ISO 19650 work stages",
   "Custom",
+  "IMI Framework (UK)",
+  "ISO 19650-2 information delivery",
+  "NATSPEC / AS ISO 19650 work stages",
+  "RIBA Plan of Work 2020",
 ];
 
 export const PHASES = ["Planning", "Design", "Construction", "Operations", "Handover"];
@@ -263,16 +283,16 @@ export const UNITS = [
 ];
 
 export const COORDINATE_SYSTEMS = [
+  "GDA2020 (Australia)",
+  "JGD2011 (Japan)",
   "Local project origin",
+  "NZGD2000 (New Zealand)",
   "Project North aligned",
   "Shared coordinate system (ETRS89 / UTM)",
-  "WGS84 geographic",
+  "SVY21 (Singapore)",
   "UK National Grid (OSGB36)",
   "US State Plane",
-  "GDA2020 (Australia)",
-  "NZGD2000 (New Zealand)",
-  "SVY21 (Singapore)",
-  "JGD2011 (Japan)",
+  "WGS84 geographic",
 ];
 
 // ---- Additional predefined values for fields across all 14 sections ----
