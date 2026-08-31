@@ -121,6 +121,7 @@ export const EXCHANGE_FORMATS = [
   "CityGML (OGC)",
   "COBie",
   "CSV / XLSX",
+  "dotBEP (open BEP data format)",
   "glTF",
   "IDS",
   "IDS 1.0",
