@@ -28,7 +28,9 @@ export const PROJECT_SECTORS = [
   "Industrial / Manufacturing",
   "Infrastructure / Civil",
   "Marine / Ports",
+  "Mining",
   "Mixed-Use",
+  "Nuclear",
   "Oil & Gas",
   "Rail",
   "Residential",
@@ -104,6 +106,7 @@ export const IFC_VERSIONS = [
   "IFC 4.3",
   "IFC 4.3 Add2 (2024)",
   "IFC 4.3.2 (IFC Reference View)",
+  "IFC 4.4 (in development)",
   "IFC 5 (in development)",
 ];
 export const MVD_OPTIONS = [
@@ -119,6 +122,7 @@ export const EXCHANGE_FORMATS = [
   "BCF",
   "BCF 3.0",
   "CityGML (OGC)",
+  "CityJSON (OGC)",
   "COBie",
   "CSV / XLSX",
   "dotBEP (open BEP data format)",
@@ -166,6 +170,7 @@ export const SOFTWARE_DISCIPLINES = [
 
 export const AUTHORING_SOFTWARE = [
   "Allplan",
+  "ArchiLabs",
   "Autodesk AutoCAD",
   "Autodesk Civil 3D",
   "Autodesk Forma",
@@ -197,6 +202,7 @@ export const COORDINATION_SOFTWARE = [
   "BIMcollab",
   "BIM Track",
   "BIMCamel",
+  "BIMserver.center",
   "BIMvision",
   "Bluebeam Revu",
   "Dalux",
@@ -217,6 +223,7 @@ export const CDE_PLATFORMS = [
   "Autodesk Construction Cloud / BIM 360",
   "Autodesk Docs",
   "Bentley ProjectWise",
+  "big CDE (DIN SPEC Level 3)",
   "BIMcollab (One Platform)",
   "Bricsys 24/7",
   "Catenda Hub",
