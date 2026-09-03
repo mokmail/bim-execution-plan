@@ -108,6 +108,7 @@ export const IFC_VERSIONS = [
   "IFC 4.3.2 (IFC Reference View)",
   "IFC 4.4 (in development)",
   "IFC 5 (in development)",
+  "IFC X (Core & Modularisation, in development)",
 ];
 export const MVD_OPTIONS = [
   "Coordination View 2.0",
@@ -205,9 +206,11 @@ export const COORDINATION_SOFTWARE = [
   "BIMserver.center",
   "BIMvision",
   "Bluebeam Revu",
+  "Cintoo Cloud",
   "Dalux",
   "Desite",
   "Graphisoft BIMx",
+  "KlashBIM",
   "Revizto",
   "Simplebim",
   "Solibri Anywhere",
