@@ -229,8 +229,10 @@ export const CDE_PLATFORMS = [
   "Bentley ProjectWise",
   "big CDE (DIN SPEC Level 3)",
   "BIMcollab (One Platform)",
+  "BIMWorkplace",
   "Bricsys 24/7",
   "Catenda Hub",
+  "CDE.Plus",
   "Common Data Environment (other)",
   "Dalux Box",
   "Fieldwire",
@@ -283,6 +285,7 @@ export const STANDARDS_OPTIONS = [
   "ISO 29481-1:2025 (Information Delivery Manual, revised)",
   "ISO 7817-1:2024 (Level of Information Need)",
   "NBIMS-US V4",
+  "OpenCDE Foundation API (v1.1)",
   "Other",
   "PAS 1192-2:2013 (legacy)",
 ];
