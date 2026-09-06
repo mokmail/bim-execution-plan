@@ -223,6 +223,7 @@ export const COORDINATION_SOFTWARE = [
 
 export const CDE_PLATFORMS = [
   "Aconex",
+  "Allplan Bimplus",
   "Asite",
   "Autodesk Construction Cloud / BIM 360",
   "Autodesk Docs",
@@ -243,6 +244,7 @@ export const CDE_PLATFORMS = [
   "Procore",
   "Think Project",
   "Trimble Connect",
+  "usBIM.platform (ACCA)",
 ];
 
 export const SECURITY_STANDARDS = [
@@ -570,6 +572,7 @@ export const LOD_STAGES = [
 export const LOD_LEVELS = [
   "LOD 100 (Concept)",
   "LOD 200 (Schematic)",
+  "LOD 250 (Early coordination)",
   "LOD 300 (Detailed design)",
   "LOD 350 (Construction)",
   "LOD 400 (Fabrication)",
