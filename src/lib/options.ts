@@ -202,6 +202,7 @@ export const AUTHORING_SOFTWARE = [
 ];
 
 export const COORDINATION_SOFTWARE = [
+  "4BIM",
   "Autodesk Navisworks",
   "Bentley iTwin / Synchro",
   "BIMcollab",
@@ -253,6 +254,7 @@ export const CDE_PLATFORMS = [
   "Think Project",
   "Trimble Connect",
   "usBIM.platform (ACCA)",
+  "Viewpoint For Projects (Trimble)",
 ];
 
 export const SECURITY_STANDARDS = [
@@ -279,6 +281,7 @@ export const STANDARDS_OPTIONS = [
   "BS 1192-4:2014 (COBie code of practice)",
   "BS EN 17412-1 (Level of Information Need)",
   "buildingSMART IDS 1.0 (Information Delivery Specification)",
+  "buildingSMART IDS 1.1 (in development)",
   "buildingSMART IFC Validation Service",
   "buildingSMART OpenCDE API (BCF/Documents/Dictionary)",
   "buildingSMART UCM (Use Case Management)",
