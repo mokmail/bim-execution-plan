@@ -239,6 +239,7 @@ export const CDE_PLATFORMS = [
   "Bentley ProjectWise",
   "big CDE (DIN SPEC Level 3)",
   "BIMcollab (One Platform)",
+  "BIMLauncher (multi-CDE data integration)",
   "BIMWorkplace",
   "Bricsys 24/7",
   "Catenda Hub",
