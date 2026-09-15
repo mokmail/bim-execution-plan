@@ -267,6 +267,7 @@ export const SECURITY_STANDARDS = [
   "ISO 19650-5:2020",
   "ISO 27001",
   "NIST SP 800-171",
+  "NIST SP 800-207 (Zero Trust Architecture)",
   "Other",
   "PAS 1192-5",
   "UK NCSC / CE marking for sensitive data",
