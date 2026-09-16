@@ -126,6 +126,7 @@ export const EXCHANGE_FORMATS = [
   "CityGML (OGC)",
   "CityJSON (OGC)",
   "COBie",
+  "COBie 3.0",
   "CSV / XLSX",
   "dotBEP (open BEP data format)",
   "GLB (glTF Binary)",
@@ -228,6 +229,7 @@ export const COORDINATION_SOFTWARE = [
   "Speckle",
   "Trimble Connect",
   "UsBIM.viewer",
+  "xeokit (open-source BIM viewer)",
 ];
 
 export const CDE_PLATFORMS = [
@@ -292,6 +294,7 @@ export const STANDARDS_OPTIONS = [
   "buildingSMART OpenCDE API (BCF/Documents/Dictionary)",
   "buildingSMART UCM (Use Case Management)",
   "CIC BIM Protocol",
+  "COBie 3.0 (NBIMS-US V4)",
   "ISO 12006-3 (buildingSMART Data Dictionary / bSDD)",
   "ISO 16739-1:2024 (IFC data schema)",
   "ISO 19650-1:2018 (Concepts & principles)",
