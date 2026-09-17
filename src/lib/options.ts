@@ -112,6 +112,7 @@ export const IFC_VERSIONS = [
   "IFC X (Core & Modularisation, in development)",
 ];
 export const MVD_OPTIONS = [
+  "Alignment Based View",
   "Coordination View 2.0",
   "Custom",
   "Design Transfer View",
@@ -255,6 +256,7 @@ export const CDE_PLATFORMS = [
   "Kahua",
   "Microsoft SharePoint / Teams",
   "Newforma",
+  "OpenProject BIM (open-source CDE)",
   "Oracle Primavera Unifier",
   "Plannerly",
   "Procore",
@@ -306,6 +308,7 @@ export const STANDARDS_OPTIONS = [
   "ISO 19650 revisions (2026 - unified whole-life process, DIS)",
   "ISO 21597 (ICDD - Information Container for Data Drop)",
   "ISO 23386 / ISO 23387 (Product Data Templates)",
+  "ISO 23387:2025 (Product Data Templates, revised)",
   "ISO 29481 (BIM Information Delivery Manual / IDM)",
   "ISO 29481-1:2025 (Information Delivery Manual, revised)",
   "ISO 7817-1:2024 (Level of Information Need)",
