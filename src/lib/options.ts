@@ -313,6 +313,7 @@ export const STANDARDS_OPTIONS = [
   "ISO 29481-1:2025 (Information Delivery Manual, revised)",
   "ISO 7817-1:2024 (Level of Information Need)",
   "ISO 7817-2 (LOIN guidance for application, in development)",
+  "ISO 7817-3 (LOIN data model & schema, in development)",
   "NBIMS-US V4",
   "OpenCDE Documents API (1.0)",
   "OpenCDE Foundation API (v1.1)",
