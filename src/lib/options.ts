@@ -221,6 +221,7 @@ export const COORDINATION_SOFTWARE = [
   "Desite",
   "Forma Design Collaboration (formerly BIM Collaborate Pro)",
   "Graphisoft BIMx",
+  "IFC.js (That Open Company, browser openBIM toolkit)",
   "KlashBIM",
   "MSUITE BIM",
   "Revizto",
