@@ -235,6 +235,7 @@ export const COORDINATION_SOFTWARE = [
 ];
 
 export const CDE_PLATFORMS = [
+  "12d Synergy",
   "Aconex",
   "Allplan Bimplus",
   "Asite",
