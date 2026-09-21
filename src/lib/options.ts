@@ -145,6 +145,7 @@ export const EXCHANGE_FORMATS = [
   "Native (RVT)",
   "PDF",
   "Structural Analysis Format (SAF)",
+  "USD (Universal Scene Description, emerging)",
   "Other",
 ];
 
