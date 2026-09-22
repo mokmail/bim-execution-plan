@@ -177,6 +177,7 @@ export const SOFTWARE_DISCIPLINES = [
 export const AUTHORING_SOFTWARE = [
   "Allplan",
   "ArchiLabs",
+  "Augmenta Construction Platform (ACP - AI electrical/MEP design)",
   "Autodesk AutoCAD",
   "Autodesk Civil 3D",
   "Autodesk Forma",
@@ -211,6 +212,7 @@ export const COORDINATION_SOFTWARE = [
   "Autodesk Navisworks",
   "Bentley iTwin / Synchro",
   "BIMcollab",
+  "BIMcollab Nexus (online coordination platform)",
   "BIMcollab Zoom (free IFC viewer)",
   "BIM Track",
   "BIMCamel",
@@ -246,6 +248,7 @@ export const CDE_PLATFORMS = [
   "Bentley ProjectWise",
   "big CDE (DIN SPEC Level 3)",
   "BIMcollab (One Platform)",
+  "BIMcollab CDE (digital twin / model-based CDE)",
   "BIMLauncher (multi-CDE data integration)",
   "BIMWorkplace",
   "Bricsys 24/7",
