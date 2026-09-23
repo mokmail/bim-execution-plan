@@ -234,6 +234,7 @@ export const COORDINATION_SOFTWARE = [
   "Speckle",
   "Trimble Connect",
   "UsBIM.viewer",
+  "xbim Flex (free IDS validation / model checking)",
   "xeokit (open-source BIM viewer)",
 ];
 
@@ -298,6 +299,7 @@ export const STANDARDS_OPTIONS = [
   "BS EN 17412-1 (Level of Information Need)",
   "buildingSMART IDS 1.0 (Information Delivery Specification)",
   "buildingSMART IDS 1.1 (in development)",
+  "buildingSMART IDS 2.0 (long-term roadmap)",
   "buildingSMART IFC Validation Service",
   "buildingSMART OpenCDE API (BCF/Documents/Dictionary)",
   "buildingSMART UCM (Use Case Management)",
