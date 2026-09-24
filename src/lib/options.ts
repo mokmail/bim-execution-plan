@@ -305,6 +305,7 @@ export const STANDARDS_OPTIONS = [
   "buildingSMART UCM (Use Case Management)",
   "CIC BIM Protocol",
   "COBie 3.0 (NBIMS-US V4)",
+  "EU Digital Product Passport (DPP) / Construction Products Regulation (CPR)",
   "ISO 12006-3 (buildingSMART Data Dictionary / bSDD)",
   "ISO 16739-1:2024 (IFC data schema)",
   "ISO 19650-1:2018 (Concepts & principles)",
