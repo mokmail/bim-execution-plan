@@ -70,6 +70,7 @@ export const CLASSIFICATION_SYSTEMS = [
   "CoClass (Sweden)",
   "Cuneco (Denmark)",
   "DIN 276 (Germany)",
+  "ETIM (international technical product classification)",
   "ISO 12006-2 (framework)",
   "ISO 81346-12 (RDS-CW / reference designations)",
   "MasterFormat",
@@ -79,6 +80,7 @@ export const CLASSIFICATION_SYSTEMS = [
   "UniFormat",
   "UniFormat 2010",
   "Uniclass 2015 (UK)",
+  "Uniclass Risk (RK health & safety risk table)",
   "Uniformat II",
 ];
 
@@ -128,6 +130,7 @@ export const MVD_OPTIONS = [
 export const EXCHANGE_FORMATS = [
   "BCF",
   "BCF 3.0",
+  "BCF 4.0 (in development)",
   "CityGML (OGC)",
   "CityGML 3.0 (OGC)",
   "CityJSON (OGC)",
@@ -143,6 +146,7 @@ export const EXCHANGE_FORMATS = [
   "IFC",
   "IFC JSON",
   "IFC XML",
+  "ifcHDF5",
   "IFCZIP",
   "ifcOWL (RDF/TTL)",
   "LandXML",
@@ -299,6 +303,7 @@ export const CDE_PLATFORMS = [
 ];
 
 export const SECURITY_STANDARDS = [
+  "Cyber Essentials (UK NCSC)",
   "GDPR-compliant data handling",
   "ISO 19650-5:2020",
   "ISO 27001",
@@ -354,6 +359,7 @@ export const STANDARDS_OPTIONS = [
   "ISO 23387:2025 (Product Data Templates, revised)",
   "ISO 29481 (BIM Information Delivery Manual / IDM)",
   "ISO 29481-1:2025 (Information Delivery Manual, revised)",
+  "ISO 29481-3:2022 (IDM data schema / SMART IDM)",
   "ISO 7817-1:2024 (Level of Information Need)",
   "ISO 7817-2 (LOIN guidance for application, in development)",
   "ISO 7817-3 (LOIN data model & schema, in development)",
@@ -363,6 +369,7 @@ export const STANDARDS_OPTIONS = [
   "OpenCDE Foundation API (v1.1)",
   "Other",
   "PAS 1192-2:2013 (legacy)",
+  "Uniclass Risk tables (HSE health & safety risk classification)",
 ];
 
 export const WORK_STAGE_REFERENCES = [
