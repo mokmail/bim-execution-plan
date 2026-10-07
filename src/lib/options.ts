@@ -149,6 +149,7 @@ export const EXCHANGE_FORMATS = [
   "ifcHDF5",
   "IFCZIP",
   "ifcOWL (RDF/TTL)",
+  "IFCX (IFC X JSON serialisation, in development)",
   "LandXML",
   "Native (DGN)",
   "Native (DWG)",
@@ -208,6 +209,7 @@ export const AUTHORING_SOFTWARE = [
   "Endra AI (AI-assisted MEP design, Revit-integrated)",
   "FreeCAD",
   "Graphisoft Archicad",
+  "Graphisoft MEP Designer (MEP authoring inside Archicad, 2025)",
   "Higharc Studio (AI-native cloud BIM for homebuilding)",
   "Homemaker (native IFC, Blender addon)",
   "Hypar (cloud parametric design & early-stage BIM)",
@@ -249,6 +251,8 @@ export const COORDINATION_SOFTWARE = [
   "KlashBIM",
   "LightTable (AI-native drawing QA/QC & peer review)",
   "MSUITE BIM",
+  "OpenAEC BIM Validator (open-source IFC & IDS validation, browser/CLI/API)",
+  "opensource.construction IFC Model Checker (browser-based WASM IFC/IDS checking)",
   "Revizto",
   "Simplebim",
   "Solibri Anywhere",
@@ -342,6 +346,7 @@ export const STANDARDS_OPTIONS = [
   "EN 18162:2026 (BIM digital twins for built environment)",
   "EU Digital Product Passport (DPP) / Construction Products Regulation (CPR)",
   "ISO 12006-3 (buildingSMART Data Dictionary / bSDD)",
+  "ISO 12911:2023 (Framework for specification of BIM implementation)",
   "ISO 16739-1:2024 (IFC data schema)",
   "ISO 19650-1 (2026 revision, ISO/DIS, information management concepts)",
   "ISO 19650-1:2018 (Concepts & principles)",
@@ -359,6 +364,7 @@ export const STANDARDS_OPTIONS = [
   "ISO 23387:2025 (Product Data Templates, revised)",
   "ISO 29481 (BIM Information Delivery Manual / IDM)",
   "ISO 29481-1:2025 (Information Delivery Manual, revised)",
+  "ISO 29481-2:2025 (IDM interaction framework, revised)",
   "ISO 29481-3:2022 (IDM data schema / SMART IDM)",
   "ISO 7817-1:2024 (Level of Information Need)",
   "ISO 7817-2 (LOIN guidance for application, in development)",
@@ -379,6 +385,7 @@ export const WORK_STAGE_REFERENCES = [
   "ISO 19650-2 information delivery",
   "NATSPEC / AS ISO 19650 work stages",
   "RIBA Plan of Work 2020",
+  "UK Building Safety Act gateways (Gateway 1-3, higher-risk buildings)",
 ];
 
 export const PHASES = ["Planning", "Design", "Construction", "Operations", "Handover"];
