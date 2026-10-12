@@ -96,6 +96,7 @@ export const CLASSIFICATION_SYSTEMS = [
 ];
 
 export const LOD_SPECIFICATIONS = [
+  "AIA E201-2022 (BIM Exhibit for Sharing Models with Project Participants, LOD 100-500)",
   "AIA E202 LOD 100-500",
   "BIMForum LOD Specification 2020",
   "BIMForum LOD Specification 2021",
@@ -132,12 +133,14 @@ export const IFC_VERSIONS = [
 export const MVD_OPTIONS = [
   "Alignment Based View",
   "Basic FM Handover View",
+  "Bridge Construction View (IFC 4.2, draft)",
   "Coordination View 2.0",
   "Custom",
   "Design Transfer View",
   "IFC4.3 (IFC4X3_ADD2) Design Transfer View",
   "IFC4.3 (IFC4X3_ADD2) Reference View",
   "IFC4precast",
+  "Product Library View (IFC4 ADD2 TC1, draft)",
   "Quantity Takeoff",
   "Reference View",
   "Structural Analysis View",
@@ -221,6 +224,7 @@ export const AUTHORING_SOFTWARE = [
   "Autodesk AutoCAD",
   "Autodesk Civil 3D",
   "Autodesk Forma",
+  "Autodesk Forma Building Design (schematic design & analysis)",
   "Autodesk Forma Site Design",
   "Autodesk Forma Street Design (parametric urban streets, 2026)",
   "Autodesk InfraWorks",
@@ -292,10 +296,12 @@ export const COORDINATION_SOFTWARE = [
   "LightTable (AI-native drawing QA/QC & peer review)",
   "Massing (IFC-native clash detection, IDS validation & BCF-API server)",
   "MSUITE BIM",
+  "Newforma Konekt (Newforma + BIM Track unified AEC information management)",
   "Nomic (AI agents for IFC/BIM model checking & drawing review)",
   "ODA MCP Servers (Open Design Alliance agent access layer for DWG / STEP / IFC models)",
   "OpenAEC BIM Validator (open-source IFC & IDS validation, browser/CLI/API)",
   "opensource.construction IFC Model Checker (browser-based WASM IFC/IDS checking)",
+  "Resolve (immersive BIM VR model review on Meta Quest, web & iPad)",
   "Revizto",
   "Simplebim",
   "Solibri Anywhere",
@@ -349,6 +355,7 @@ export const CDE_PLATFORMS = [
   "Plannerly",
   "Procore",
   "Procore CDE (connected CDE & agentic AI, EMEA 2026)",
+  "StreamBIM (Rendra - field BIM collaboration & model-based construction, Norway)",
   "That Open Platform (openBIM cloud CDE / BIM operating system)",
   "Think Project",
   "Thinkproject NextGen CDE / HANDOVER (AI-powered ISO 19650 CDE)",
@@ -362,6 +369,7 @@ export const CDE_PLATFORMS = [
 export const SECURITY_STANDARDS = [
   "Cyber Essentials (UK NCSC)",
   "Cyber Essentials Plus (UK NCSC)",
+  "EU Cyber Resilience Act (CRA) (EU) 2024/2847",
   "GDPR-compliant data handling",
   "IEC 62443 (industrial automation & control systems cyber security)",
   "ISO 19650-5:2020",
@@ -385,7 +393,11 @@ export const SECURITY_CLASSIFICATIONS = [
 ];
 
 export const STANDARDS_OPTIONS = [
+  "AIA E201-2022 (BIM Exhibit for Sharing Models with Project Participants)",
   "AIA E203 / G202",
+  "AIA E401-2022 / E402-2022 (BIM Exhibits for design team / construction team)",
+  "AIA G203-2022 (BIM Execution Plan form)",
+  "AIA G204-2022 / G205-2022 (Model Element Table / Abbreviated Model Element Table)",
   "BS 1192-4:2014 (COBie code of practice)",
   "BS EN 17412-1 (Level of Information Need)",
   "buildingSMART IDS 1.0 (Information Delivery Specification)",
@@ -435,6 +447,7 @@ export const STANDARDS_OPTIONS = [
   "ISO 7817-2 (LOIN guidance for application, in development)",
   "ISO 7817-3 (LOIN data model & schema, in development)",
   "NBIMS-US V4",
+  "NBIMS-US V4 Project BIM Requirements (PBR) module",
   "openBIM Harmony (European buildingSMART EIR/BEP framework)",
   "OpenCDE Documents API (1.0)",
   "OpenCDE Foundation API (v1.1)",
@@ -476,6 +489,7 @@ export const COORDINATE_SYSTEMS = [
   "RGF93 / Lambert-93 (France)",
   "S-JTSK / Krovak (Czechia & Slovakia)",
   "Shared coordinate system (ETRS89 / UTM)",
+  "SIRGAS 2000 (Latin America)",
   "SVY21 (Singapore)",
   "UK National Grid (OSGB36)",
   "US State Plane",
